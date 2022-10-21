@@ -18,7 +18,7 @@ export const ResumeValidation = yup.object().shape({
   countryCode: yup.string().required("Country Required"),
   email: yup
     .string()
-    .email()
+    .email("Must be a valid email")
     .required("Email is required")
     .matches("^[A-Za-z0-9+_.-]+@(.+)$", "Invalid email format"),
   address: yup.string().required("Address is required"),

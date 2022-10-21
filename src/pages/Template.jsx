@@ -1,11 +1,11 @@
 //React
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 
-//Save Template
-import { jsPDF } from "jspdf";
-import { toPng } from "html-to-image";
+//React Router
+import { useNavigate, useParams } from "react-router-dom";
 
-import { useLocation } from "react-router-dom";
+//Context
+import { useValuesContext } from "../context/ValuesContext";
 
 //DaisyUI
 import { Button, Divider } from "react-daisyui";
@@ -16,8 +16,14 @@ import envelope from "../assets/envelope-fill.svg";
 import telephone from "../assets/telephone-fill.svg";
 
 const Template = () => {
-  const { state } = useLocation();
+  const navigate = useNavigate();
+  const { id } = useParams();
   const TemplateRef = useRef();
+  const { getValues } = useValuesContext();
+
+  useEffect(() => {
+    if (id != ":r1:") navigate("/");
+  }, []);
 
   const {
     firstName,
@@ -33,18 +39,23 @@ const Template = () => {
     languages,
     skills,
     activities,
-  } = state;
+  } = getValues();
 
-  const downloadPDF = () => {
+  const downloadPDF = async () => {
     const template = TemplateRef.current;
-    toPng(template).then((url) => {
-      const pdf = new jsPDF();
-      const imgProps = pdf.getImageProperties(url);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-      pdf.addImage(url, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`${firstName} ${lastName}'s CV.pdf`);
-    });
+    template.id = "scale-cv";
+    let opt = {
+      margin: 1,
+      filename: `${firstName} ${lastName}'s CV.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { format: "a4", orientation: "portrait" },
+    };
+    await html2pdf(template, opt);
+
+    setTimeout(() => {
+      template.id = "";
+    }, 3000);
   };
 
   return (
@@ -55,8 +66,8 @@ const Template = () => {
       >
         {/* Name */}
         <div className="self-start py-8 mx-12">
-          <h1 className="text-5xl font-normal text-slate-900">
-            {firstName} {lastName}
+          <h1 className="text-5xl font-normal">
+            {firstName && firstName} {lastName && lastName}
           </h1>
         </div>
 
@@ -64,22 +75,22 @@ const Template = () => {
 
         {/* Profile */}
         <div className="self-start py-6 mx-12 text-justify">
-          <p>{profile}</p>
+          <p>{profile && profile}</p>
         </div>
 
         {/* Personal Info */}
         <div className="flex flex-row bg-blue-200 text-black mx-12 justify-around items-center py-4">
           <span className="flex flex-row gap-4 text-lg">
             <img src={map} />
-            {address}
+            {address && address}
           </span>
           <span className="flex flex-row gap-4 text-lg">
             <img src={envelope} />
-            {email}
+            {email && email}
           </span>
           <span className="flex flex-row gap-4 text-lg">
             <img src={telephone} />
-            {countryCode} {phone}
+            {countryCode && countryCode} {phone && phone}
           </span>
         </div>
 
@@ -93,7 +104,7 @@ const Template = () => {
             </div>
 
             {/* To be repeated */}
-            {academic.map((item, index) => (
+            {academic?.map((item, index) => (
               <div key={index}>
                 <div className="flex flex-col pl-8">
                   <h3 className="font-semibold">
@@ -118,14 +129,10 @@ const Template = () => {
 
             <div className="flex flex-row pl-4 gap-4 flex-wrap">
               {/* To be repeated */}
-              {languages.map((language, index) => (
+              {languages?.map((language, index) => (
                 <div key={index} className="flex flex-col pl-8 w-1/3">
                   <h3 className="font-semibold">{language.language}</h3>
-                  <progress
-                    className="progress progress-info w-full"
-                    value={language.level}
-                    max="100"
-                  ></progress>
+                  <p>{language.level}</p>
                 </div>
               ))}
             </div>
@@ -135,7 +142,7 @@ const Template = () => {
         {/* Professional Experience & Skills */}
         <div className="flex flex-row justify-between items-start mx-12 mt-8 gap-8">
           {/* Professional Experience */}
-          {experience.length > 0 && (
+          {experience?.length > 0 && (
             <div className="flex flex-col w-full">
               <div className="flex-flex-col w-full">
                 <div className="flex flex-row items-center gap-x-4">
@@ -177,7 +184,7 @@ const Template = () => {
           )}
 
           {/* Skills */}
-          {skills.length > 0 && (
+          {skills?.length > 0 && (
             <div className="flex-flex-col w-1/2">
               <div className="flex flex-row items-center gap-x-4">
                 <h1 className="text-2xl py-2">Skills</h1>
@@ -188,7 +195,7 @@ const Template = () => {
                 {skills.map((skill, index) => (
                   <div
                     key={index}
-                    className="basis-1/3 p-4 bg-blue-200 rounded-lg font-semibold text-center"
+                    className="basis-1/3 p-4 font-semibold text-center"
                   >
                     {skill?.skill}
                   </div>
@@ -201,7 +208,7 @@ const Template = () => {
         {/* Achievements & Activities */}
         <div className="flex flex-row justify-between items-start mx-12 mt-8 gap-8">
           {/* Achievements */}
-          {achievements.length > 0 && (
+          {achievements?.length > 0 && (
             <div className="flex flex-col w-full">
               <div className="flex flex-row items-center gap-x-4">
                 <h1 className="text-2xl py-2">Achievements</h1>
@@ -224,7 +231,7 @@ const Template = () => {
           )}
 
           {/* Activities */}
-          {activities.length > 0 && (
+          {activities?.length > 0 && (
             <div className="flex-flex-col w-1/2">
               <div className="flex flex-row items-center gap-x-4">
                 <h1 className="text-2xl py-2">Activities</h1>
@@ -235,7 +242,7 @@ const Template = () => {
                 {activities.map((item, index) => (
                   <div
                     key={index}
-                    className="w-1/4 p-4 bg-blue-200 rounded-lg font-semibold text-center"
+                    className="w-1/4 p-4 font-semibold text-center"
                   >
                     {item?.activity}
                   </div>

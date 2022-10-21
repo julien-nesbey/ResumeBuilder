@@ -1,3 +1,29 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+*::selection {
+  background-color: white;
+  color: black;
+  border-radius: 10px;
+}
+
+html,
+body {
+  scroll-behavior: smooth;
+}
+
+#build-root {
+  background-image: url("./assets/Fill-in.svg");
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-attachment: fixed;
+  background-blend-mode: multiply;
+}
+
+#scale-cv {
+  transition: 0.3s;
+  max-width: 210mm;
+  color: #111111;
+}

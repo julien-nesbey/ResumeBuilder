@@ -1,3 +1,6 @@
+//React
+import { useId } from "react";
+
 //Components
 import Navbar from "../components/Navbar";
 
@@ -12,6 +15,9 @@ import useFormPersist from "react-hook-form-persist";
 //Form Validation
 import { ResumeValidation } from "../validations/ResumeValidation";
 
+//Context
+import { useValuesContext } from "../context/ValuesContext";
+
 //DaisyUI
 import { Input, InputGroup, Textarea, Divider, Button } from "react-daisyui";
 
@@ -20,6 +26,8 @@ import { countries } from "../api";
 
 const Build = () => {
   const navigate = useNavigate();
+  const { addValues } = useValuesContext();
+  const id = useId();
 
   const {
     handleSubmit,
@@ -108,114 +116,129 @@ const Build = () => {
     name: "activities",
   });
 
-  const onSubmit = (values) => {
-    navigate("/preview", {
-      state: {
-        firstName: values.firstName,
-        lastName: values.lastName,
-        email: values.email,
-        countryCode: values.countryCode,
-        phone: values.phone,
-        address: values.address,
-        profile: values.profile,
-        academic: values.academic,
-        experience: values.experience,
-        achievements: values.achievements,
-        languages: values.languages,
-        skills: values.skills,
-        activities: values.activities,
-      },
+  const onSubmit = async (values) => {
+    await addValues({
+      firstName: values.firstName,
+      lastName: values.lastName,
+      email: values.email,
+      countryCode: values.countryCode,
+      phone: values.phone,
+      address: values.address,
+      profile: values.profile,
+      academic: values.academic,
+      experience: values.experience,
+      achievements: values.achievements,
+      languages: values.languages,
+      skills: values.skills,
+      activities: values.activities,
     });
+    navigate(`/preview/${id}`);
   };
 
   return (
     <>
-      <Navbar />
-      <div className="container mx-auto h-screen" data-theme="dark">
+      <div id="build-root" className="px-2 mx-auto" data-theme="dark">
+        <Navbar />
         <form onSubmit={handleSubmit(onSubmit)} name="resumeForm">
           {/* Personal Info */}
           <h1 className="text-3xl font-bold">Personal Info (Required)</h1>
-          <div className="flex justify-around mb-4">
-            <InputGroup>
-              <span className="label-text">First Name</span>
-              <Input
-                className={`w-2/4 ${errors?.firstName && "border-error"}`}
-                {...register("firstName")}
-              />
-              {errors?.firstName?.message}
+          <div className="flex flex-col gap-4 my-4 sm:flex-row sm:justify-around">
+            <InputGroup className="flex flex-col">
+              <div className="flex flex-row">
+                <span className="label-text">First Name</span>
+                <Input
+                  className={`w-2/4 ${errors?.firstName && "border-error"}`}
+                  {...register("firstName")}
+                />
+              </div>
+              <small className="text-error">{errors?.firstName?.message}</small>
             </InputGroup>
-            <InputGroup>
-              <span className="label-text">Last Name</span>
-              <Input
-                className={`w-2/4 ${errors?.lastName && "border-error"}`}
-                {...register("lastName")}
-              />
-              {errors?.lastName?.message}
+            <InputGroup className="flex flex-col">
+              <div className="flex flex-row">
+                <span className="label-text">Last Name</span>
+                <Input
+                  className={`w-2/4 ${errors?.lastName && "border-error"}`}
+                  {...register("lastName")}
+                />
+              </div>
+              <small className="text-error">{errors?.lastName?.message}</small>
             </InputGroup>
           </div>
 
-          <div className="flex justify-around mb-4">
-            <InputGroup>
-              <span className="label-text">Country</span>
-              <select
-                className={`select w-2/4 border-2 ${
-                  errors?.countryCode && "border-error"
-                }`}
-                {...register("countryCode")}
-              >
-                <option value="" selected>
-                  Select a country
-                </option>
-                {countries.map((country, index) => {
-                  let code = `+${country.callingCodes[0]}`;
-                  return (
-                    <option key={index} value={code}>
-                      {country.name} - {code}
-                    </option>
-                  );
-                })}
-              </select>
-              {errors?.countryCode?.message}
+          <div className="flex flex-col gap-4 my-4 sm:flex-row sm:justify-around">
+            <InputGroup className="flex flex-col">
+              <div className="flex flex-row">
+                <span className="label-text">Country</span>
+                <select
+                  className={`select w-2/4 border-2 ${
+                    errors?.countryCode && "border-error"
+                  }`}
+                  {...register("countryCode")}
+                >
+                  <option value="" selected>
+                    Select a country
+                  </option>
+                  {countries.map((country, index) => {
+                    let code = `+${country.callingCodes[0]}`;
+                    return (
+                      <option key={index} value={code}>
+                        {country.name} - {code}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+              <small className="text-error">
+                {errors?.countryCode?.message}
+              </small>
             </InputGroup>
-            <InputGroup>
-              <span className="label-text">Phone Number</span>
-              <Input
-                className={`w-2/4 ${errors?.phone && "border-error"}`}
-                {...register("phone")}
-              />
-              {errors?.phone?.message}
+            <InputGroup className="flex flex-col">
+              <div className="flex flex-row">
+                <span className="label-text">Phone Number</span>
+                <Input
+                  className={`w-2/4 ${errors?.phone && "border-error"}`}
+                  {...register("phone")}
+                />
+              </div>
+              <small className="text-error">{errors?.phone?.message}</small>
             </InputGroup>
             {/* Country */}
           </div>
 
-          <div className="flex justify-around mb-4">
-            <InputGroup>
-              <span className="label-text">Address</span>
-              <Input
-                className={`w-2/4 ${errors?.address && "border-error"}`}
-                {...register("address")}
-              />
-              {errors?.address?.message}
+          <div className="flex flex-col gap-4 my-4 sm:flex-row sm:justify-around">
+            <InputGroup className="flex flex-col">
+              <div className="flex flex-row">
+                <span className="label-text">Address</span>
+                <Input
+                  className={`w-2/4 ${errors?.address && "border-error"}`}
+                  {...register("address")}
+                />
+              </div>
+              <small className="text-error">{errors?.address?.message}</small>
             </InputGroup>
-            <InputGroup>
-              <span className="label-text">Email Address</span>
-              <Input
-                className={`w-2/4 ${errors?.email && "border-error"}`}
-                {...register("email")}
-              />
-              {errors?.email?.message}
+            <InputGroup className="flex flex-col">
+              <div className="flex flex-row">
+                <span className="label-text">Email Address</span>
+                <Input
+                  className={`w-2/4 ${errors?.email && "border-error"}`}
+                  {...register("email")}
+                />
+              </div>
+              <small className="text-error">{errors?.email?.message}</small>
             </InputGroup>
           </div>
-          <div className="flex justify-around mb-4">
-            <InputGroup>
-              <span className="label-text">Profile</span>
-              <Textarea
-                rows={2}
-                cols={150}
-                {...register("profile")}
-                className={`${errors?.profile && "border-error"}`}
-              ></Textarea>
-              {errors?.profile?.message}
+          <div className="flex flex-col gap-4 my-4 sm:flex-row sm:justify-around">
+            <InputGroup className="flex flex-col">
+              <div className="flex flex-row">
+                <span className="label-text">Profile</span>
+                <Textarea
+                  rows={2}
+                  cols={150}
+                  {...register("profile")}
+                  className={`${errors?.profile && "border-error"}`}
+                ></Textarea>
+              </div>
+              <small className="text-error">{errors?.profile?.message}</small>
             </InputGroup>
           </div>
 
@@ -229,7 +252,7 @@ const Build = () => {
             {AcademicFields.map((field, index) => (
               <div
                 key={field.id}
-                className="flex flex-col flex-1 h-20 w-full gap-2"
+                className="flex flex-col flex-1 h-20 w-full gap-4"
               >
                 <p className="mb-4">
                   <span className="bg-primary w-fit p-4 rounded-lg text-lg font-semibold mr-4">
@@ -244,57 +267,111 @@ const Build = () => {
                     </span>
                   )}
                 </p>
-                <InputGroup>
-                  <span className="label-text">School Name</span>
-                  <Input
-                    {...register(`academic.${index}.school`)}
-                    className="w-2/4"
-                  />
-                  {errors.academic != undefined &&
-                    errors?.academic[index]?.school?.message}
+                <InputGroup className="flex flex-col">
+                  <div className="flex flex-row">
+                    <span className="label-text">School Name</span>
+                    <Input
+                      {...register(`academic.${index}.school`)}
+                      className={`w-2/4 ${
+                        errors?.academic != undefined &&
+                        errors?.academic[index]?.school &&
+                        "border-error"
+                      }`}
+                    />
+                  </div>
+                  <small className="text-error">
+                    {errors.academic != undefined &&
+                      errors?.academic[index]?.school?.message}
+                  </small>
                 </InputGroup>
-                <InputGroup>
-                  <span className="label-text">Degree</span>
-                  <Input
-                    {...register(`academic.${index}.degree`)}
-                    className="w-2/4"
-                  />
-                  {errors.academic != undefined &&
-                    errors?.academic[index]?.degree?.message}
+                <InputGroup className="flex flex-col">
+                  <div className="flex flex-row">
+                    <span className="label-text">Degree</span>
+                    <Input
+                      {...register(`academic.${index}.degree`)}
+                      className={`w-2/4 ${
+                        errors?.academic != undefined &&
+                        errors?.academic[index]?.degree &&
+                        "border-error"
+                      }`}
+                    />
+                  </div>
+                  <small className="text-error">
+                    {errors.academic != undefined &&
+                      errors?.academic[index]?.degree?.message}
+                  </small>
                 </InputGroup>
-                <InputGroup>
-                  <span className="label-text">Specialization</span>
-                  <Input
-                    {...register(`academic.${index}.specialization`)}
-                    className="w-2/4"
-                  />
-                  {errors.academic != undefined &&
-                    errors?.academic[index]?.specialization?.message}
+                <InputGroup className="flex flex-col">
+                  <div className="flex flex-row">
+                    <span className="label-text">Specialization</span>
+                    <Input
+                      {...register(`academic.${index}.specialization`)}
+                      className={`w-2/4 ${
+                        errors?.academic != undefined &&
+                        errors?.academic[index]?.specialization &&
+                        "border-error"
+                      }`}
+                    />
+                  </div>
+                  <small className="text-error">
+                    {errors.academic != undefined &&
+                      errors?.academic[index]?.specialization?.message}
+                  </small>
                 </InputGroup>
-                <InputGroup>
-                  <span className="label-text">From</span>
-                  <Input
-                    type={"month"}
-                    {...register(`academic.${index}.period.start`)}
-                  />
-                  {errors.academic != undefined &&
-                    errors?.academic[index]?.period?.start?.message}
-                  <span className="label-text">To</span>
-                  <Input
-                    type={"month"}
-                    {...register(`academic.${index}.period.end`)}
-                  />
-                  {errors.academic != undefined &&
-                    errors?.academic[index]?.period?.end?.message}
-                </InputGroup>
-                <InputGroup>
-                  <span className="label-text">Location</span>
-                  <Input
-                    {...register(`academic.${index}.location`)}
-                    className="w-2/4"
-                  />
-                  {errors.academic != undefined &&
-                    errors?.academic[index]?.location?.message}
+                <div className="flex flex-col gap-4 my-4 sm:flex-row">
+                  <InputGroup className="flex flex-col">
+                    <div className="flex flex-row">
+                      <span className="label-text">From</span>
+                      <Input
+                        type={"month"}
+                        {...register(`academic.${index}.period.start`)}
+                        className={`${
+                          errors?.academic != undefined &&
+                          errors?.academic[index]?.period?.start &&
+                          "border-error"
+                        }`}
+                      />
+                    </div>
+                    <small className="text-error">
+                      {errors.academic != undefined &&
+                        errors?.academic[index]?.period?.start?.message}
+                    </small>
+                  </InputGroup>
+                  <InputGroup className="flex flex-col">
+                    <div className="flex flex-row">
+                      <span className="label-text">To</span>
+                      <Input
+                        type={"month"}
+                        {...register(`academic.${index}.period.end`)}
+                        className={`${
+                          errors?.academic != undefined &&
+                          errors?.academic[index]?.period?.end &&
+                          "border-error"
+                        }`}
+                      />
+                    </div>
+                    <small className="text-error">
+                      {errors.academic != undefined &&
+                        errors?.academic[index]?.period?.end?.message}
+                    </small>
+                  </InputGroup>
+                </div>
+                <InputGroup className="flex flex-col">
+                  <div className="flex flex-row">
+                    <span className="label-text">Location</span>
+                    <Input
+                      {...register(`academic.${index}.location`)}
+                      className={`w-2/4 ${
+                        errors?.academic != undefined &&
+                        errors?.academic[index]?.location &&
+                        "border-error"
+                      }`}
+                    />
+                  </div>
+                  <small className="text-error">
+                    {errors.academic != undefined &&
+                      errors?.academic[index]?.location?.message}
+                  </small>
                 </InputGroup>
                 <Divider />
               </div>
@@ -317,7 +394,7 @@ const Build = () => {
             {ExperienceFields.map((field, index) => (
               <div
                 key={field.id}
-                className="flex flex-col flex-1 h-20 w-full gap-2"
+                className="flex flex-col flex-1 h-20 w-full gap-4"
               >
                 <p className="mb-4">
                   <span className="bg-primary w-fit p-4 rounded-lg text-lg font-semibold mr-4">
@@ -330,59 +407,114 @@ const Build = () => {
                     X
                   </span>
                 </p>
-                <InputGroup>
-                  <span className="label-text">Company Name</span>
-                  <Input
-                    {...register(`experience.${index}.company`)}
-                    className="w-2/4"
-                  />
-                  {errors.experience != undefined &&
-                    errors?.experience[index]?.company?.message}
+                <InputGroup className="flex flex-col">
+                  <div className="flex flex-row">
+                    <span className="label-text">Company Name</span>
+                    <Input
+                      {...register(`experience.${index}.company`)}
+                      className={`w-2/4 ${
+                        errors?.experience != undefined &&
+                        errors?.experience[index]?.company &&
+                        "border-error"
+                      }`}
+                    />
+                  </div>
+                  <small className="text-error">
+                    {errors.experience != undefined &&
+                      errors?.experience[index]?.company?.message}
+                  </small>
                 </InputGroup>
-                <InputGroup>
-                  <span className="label-text">Position</span>
-                  <Input
-                    {...register(`experience.${index}.position`)}
-                    className="w-2/4"
-                  />
-                  {errors.experience != undefined &&
-                    errors?.experience[index]?.position?.message}
+                <InputGroup className="flex flex-col">
+                  <div className="flex flex-row">
+                    <span className="label-text">Position</span>
+                    <Input
+                      {...register(`experience.${index}.position`)}
+                      className={`w-2/4 ${
+                        errors?.experience != undefined &&
+                        errors?.experience[index]?.position &&
+                        "border-error"
+                      }`}
+                    />
+                  </div>
+                  <small className="text-error">
+                    {errors.experience != undefined &&
+                      errors?.experience[index]?.position?.message}
+                  </small>
                 </InputGroup>
-                <InputGroup>
-                  <span className="label-text">From</span>
-                  <Input
-                    type={"month"}
-                    {...register(`experience.${index}.period.start`)}
-                  />
-                  {errors.experience != undefined &&
-                    errors?.experience[index]?.period?.start?.message}
-                  <span className="label-text">To</span>
-                  <Input
-                    type={"month"}
-                    {...register(`experience.${index}.period.end`)}
-                  />
-                  {errors.experience != undefined &&
-                    errors?.experience[index]?.period?.end?.message}
+                <div className="flex flex-col gap-4 my-4 sm:flex-row sm:justify-around">
+                  <InputGroup className="flex flex-col">
+                    <div className="flex flex-row">
+                      <span className="label-text">From</span>
+                      <Input
+                        type={"month"}
+                        {...register(`experience.${index}.period.start`)}
+                        className={`${
+                          errors?.experience != undefined &&
+                          errors?.experience[index]?.period?.start &&
+                          "border-error"
+                        }`}
+                      />
+                    </div>
+                    <small className="text-error">
+                      {errors.experience != undefined &&
+                        errors?.experience[index]?.period?.start?.message}
+                    </small>
+                  </InputGroup>
+                  <InputGroup className="flex flex-col">
+                    <div className="flex flex-row">
+                      <span className="label-text">To</span>
+                      <Input
+                        type={"month"}
+                        {...register(`experience.${index}.period.end`)}
+                        className={`${
+                          errors?.experience != undefined &&
+                          errors?.experience[index]?.period?.end &&
+                          "border-error"
+                        }`}
+                      />
+                    </div>
+                    <small className="text-error">
+                      {errors.experience != undefined &&
+                        errors?.experience[index]?.period?.end?.message}
+                    </small>
+                  </InputGroup>
+                </div>
+                <InputGroup className="flex flex-col">
+                  <div className="flex flex-row">
+                    <span className="label-text">Location</span>
+                    <Input
+                      {...register(`experience.${index}.location`)}
+                      className={`w-2/4 ${
+                        errors?.experience != undefined &&
+                        errors?.experience[index]?.location &&
+                        "border-error"
+                      }`}
+                    />
+                  </div>
+                  <small className="text-error">
+                    {errors.experience != undefined &&
+                      errors?.experience[index]?.location?.message}
+                  </small>
                 </InputGroup>
-                <InputGroup>
-                  <span className="label-text">Location</span>
-                  <Input
-                    {...register(`experience.${index}.location`)}
-                    className="w-2/4"
-                  />
-                  {errors.experience != undefined &&
-                    errors?.experience[index]?.location?.message}
-                </InputGroup>
-                <InputGroup>
-                  <span className="label-text">Main Duties</span>
-                  <Textarea
-                    rows={3}
-                    cols={100}
-                    placeholder="Separate with commas (,)"
-                    {...register(`experience.${index}.duties`)}
-                  ></Textarea>
-                  {errors.experience != undefined &&
-                    errors?.experience[index]?.duties?.message}
+                <InputGroup className="flex flex-col">
+                  <div className="flex flex-row">
+                    <span className="label-text">Main Duties</span>
+                    <Textarea
+                      rows={3}
+                      cols={100}
+                      placeholder="Separate with commas (,)"
+                      {...register(`experience.${index}.duties`)}
+                      className={`${
+                        errors?.experience != undefined &&
+                        errors?.experience[index]?.duties &&
+                        "border-error"
+                      }`}
+                    ></Textarea>
+                  </div>
+                  <small className="text-error">
+                    {errors.experience != undefined &&
+                      errors?.experience[index]?.duties?.message}
+                  </small>
                 </InputGroup>
                 <Divider />
               </div>
@@ -403,7 +535,7 @@ const Build = () => {
             {AchievementsFields.map((field, index) => (
               <div
                 key={field.id}
-                className="flex flex-col flex-1 h-20 w-full gap-2"
+                className="flex flex-col flex-1 h-20 w-full gap-4"
               >
                 <p className="mb-4">
                   <span className="bg-primary w-fit p-4 rounded-lg text-lg font-semibold mr-4">
@@ -416,32 +548,50 @@ const Build = () => {
                     X
                   </span>
                 </p>
-                <InputGroup>
-                  <span className="label-text">Achievement Name</span>
-                  <Input
-                    {...register(`achievements.${index}.achievement`)}
-                    className="w-2/4"
-                  />
-                  {errors.achievements != undefined &&
-                    errors?.achievements[index]?.achievement?.message}
+                <InputGroup className="flex flex-col">
+                  <div className="flex flex-row">
+                    <span className="label-text">Achievement Name</span>
+                    <Input
+                      {...register(`achievements.${index}.achievement`)}
+                      className={`w-2/4 ${
+                        errors?.achievements != undefined &&
+                        errors?.achievements[index]?.achievement &&
+                        "border-error"
+                      }`}
+                    />
+                  </div>
+                  <small className="text-error">
+                    {errors.achievements != undefined &&
+                      errors?.achievements[index]?.achievement?.message}
+                  </small>
                 </InputGroup>
-                <InputGroup>
-                  <span className="label-text">Period</span>
-                  <Input
-                    type={"month"}
-                    {...register(`achievements.${index}.period`)}
-                    className="w-2/4"
-                  />
-                  {errors.achievements != undefined &&
-                    errors?.achievements[index]?.period?.message}
+                <InputGroup className="flex flex-col">
+                  <div className="flex flex-row">
+                    <span className="label-text">Period</span>
+                    <Input
+                      type={"month"}
+                      {...register(`achievements.${index}.period`)}
+                      className={`w-2/4 ${
+                        errors?.achievements != undefined &&
+                        errors?.achievements[index]?.period &&
+                        "border-error"
+                      }`}
+                    />
+                  </div>
+                  <small className="text-error">
+                    {errors.achievements != undefined &&
+                      errors?.achievements[index]?.period?.message}
+                  </small>
                 </InputGroup>
-                <InputGroup>
-                  <span className="label-text">Description (Optional)</span>
-                  <Textarea
-                    cols={100}
-                    rows={3}
-                    {...register(`achievements.${index}.description`)}
-                  ></Textarea>
+                <InputGroup className="flex flex-col">
+                  <div className="flex flex-row">
+                    <span className="label-text">Description (Optional)</span>
+                    <Textarea
+                      cols={100}
+                      rows={3}
+                      {...register(`achievements.${index}.description`)}
+                    ></Textarea>
+                  </div>
                 </InputGroup>
                 <Divider />
               </div>
@@ -464,7 +614,7 @@ const Build = () => {
             {LanguageFields.map((field, index) => (
               <div
                 key={field.id}
-                className="flex flex-col flex-1 h-20 w-full gap-2"
+                className="flex flex-col flex-1 h-20 w-full gap-4"
               >
                 <p className="mb-4">
                   <span className="bg-primary w-fit p-4 rounded-lg text-lg font-semibold mr-4">
@@ -479,57 +629,68 @@ const Build = () => {
                     </span>
                   )}
                 </p>
-                <InputGroup>
-                  <span className="label-text">Language Name</span>
-                  <Input
-                    {...register(`languages.${index}.language`)}
-                    className="w-2/4"
-                  />
-                  {errors.languages != undefined &&
-                    errors?.languages[index]?.language?.message}
+                <InputGroup className="flex flex-col">
+                  <div className="flex flex-row">
+                    <span className="label-text">Language Name</span>
+                    <Input
+                      {...register(`languages.${index}.language`)}
+                      className={`w-2/4 ${
+                        errors?.languages != undefined &&
+                        errors?.languages[index]?.language &&
+                        "border-error"
+                      }`}
+                    />
+                  </div>
+                  <small className="text-error">
+                    {errors.languages != undefined &&
+                      errors?.languages[index]?.language?.message}
+                  </small>
                 </InputGroup>
-                <InputGroup>
-                  <span className="label-text">Level</span>
-                  <div className="flex flex-col w-2/4 justify-center items-center">
-                    <Input
-                      type={"radio"}
-                      value="25"
-                      {...register(`languages.${index}.level`)}
-                      className="w-2/4"
-                    />
-                    <small className="text-lg font-semibold">Beginner</small>
+                <InputGroup className="flex flex-col">
+                  <div className="flex flex-row w-full">
+                    <div className="flex flex-col w-2/4 justify-center items-center">
+                      <Input
+                        type={"radio"}
+                        value="Beginner"
+                        {...register(`languages.${index}.level`)}
+                        className="w-2/4 accent-black"
+                      />
+                      <small className="text-lg font-semibold">Beginner</small>
+                    </div>
+                    <div className="flex flex-col w-2/4 justify-center items-center">
+                      <Input
+                        type={"radio"}
+                        value="Intermediate"
+                        {...register(`languages.${index}.level`)}
+                        className="w-2/4 accent-black"
+                      />
+                      <small className="text-lg font-semibold">
+                        Intermediate
+                      </small>
+                    </div>
+                    <div className="flex flex-col w-2/4 justify-center items-center">
+                      <Input
+                        type={"radio"}
+                        value="Advanced"
+                        {...register(`languages.${index}.level`)}
+                        className="w-2/4 outline-error accent-black"
+                      />
+                      <small className="text-lg font-semibold">Advanced</small>
+                    </div>
+                    <div className="flex flex-col w-2/4 justify-center items-center">
+                      <Input
+                        type={"radio"}
+                        value="Native"
+                        {...register(`languages.${index}.level`)}
+                        className="w-2/4 accent-black"
+                      />
+                      <small className="text-lg font-semibold">Native</small>
+                    </div>
                   </div>
-                  <div className="flex flex-col w-2/4 justify-center items-center">
-                    <Input
-                      type={"radio"}
-                      value="50"
-                      {...register(`languages.${index}.level`)}
-                      className="w-2/4"
-                    />
-                    <small className="text-lg font-semibold">
-                      Intermediate
-                    </small>
-                  </div>
-                  <div className="flex flex-col w-2/4 justify-center items-center">
-                    <Input
-                      type={"radio"}
-                      value="75"
-                      {...register(`languages.${index}.level`)}
-                      className="w-2/4"
-                    />
-                    <small className="text-lg font-semibold">Advanced</small>
-                  </div>
-                  <div className="flex flex-col w-2/4 justify-center items-center">
-                    <Input
-                      type={"radio"}
-                      value="100"
-                      {...register(`languages.${index}.level`)}
-                      className="w-2/4"
-                    />
-                    <small className="text-lg font-semibold">Native</small>
-                  </div>
-                  {errors.languages != undefined &&
-                    errors?.languages[index]?.level?.message}
+                  <small className="text-error">
+                    {errors.languages != undefined &&
+                      errors?.languages[index]?.level?.message}
+                  </small>
                 </InputGroup>
                 <Divider />
               </div>
@@ -550,7 +711,7 @@ const Build = () => {
             {SkillsFields.map((field, index) => (
               <div
                 key={field.id}
-                className="flex flex-col flex-1 h-20 w-full gap-2"
+                className="flex flex-col flex-1 h-20 w-full gap-4"
               >
                 <p className="mb-4">
                   <span className="bg-primary w-fit p-4 rounded-lg text-lg font-semibold mr-4">
@@ -563,14 +724,22 @@ const Build = () => {
                     X
                   </span>
                 </p>
-                <InputGroup>
-                  <span className="label-text">Skill</span>
-                  <Input
-                    {...register(`skills.${index}.skill`)}
-                    className="w-2/4"
-                  />
-                  {errors.skills != undefined &&
-                    errors?.skills[index]?.skill?.message}
+                <InputGroup className="flex flex-col">
+                  <div className="flex flex-row">
+                    <span className="label-text">Skill</span>
+                    <Input
+                      {...register(`skills.${index}.skill`)}
+                      className={`w-2/4 ${
+                        errors?.skills != undefined &&
+                        errors?.skills[index]?.skill &&
+                        "border-error"
+                      }`}
+                    />
+                  </div>
+                  <small className="text-error">
+                    {errors.skills != undefined &&
+                      errors?.skills[index]?.skill?.message}
+                  </small>
                 </InputGroup>
                 <Divider />
               </div>
@@ -591,7 +760,7 @@ const Build = () => {
             {ActivitiesFields.map((field, index) => (
               <div
                 key={field.id}
-                className="flex flex-col flex-1 h-20 w-full gap-2"
+                className="flex flex-col flex-1 h-20 w-full gap-4"
               >
                 <p className="mb-4">
                   <span className="bg-primary w-fit p-4 rounded-lg text-lg font-semibold mr-4">
@@ -604,14 +773,22 @@ const Build = () => {
                     X
                   </span>
                 </p>
-                <InputGroup>
-                  <span className="label-text">Activity Name</span>
-                  <Input
-                    {...register(`activities.${index}.activity`)}
-                    className="w-2/4"
-                  />
-                  {errors.activities != undefined &&
-                    errors?.activities[index]?.activity?.message}
+                <InputGroup className="flex flex-col">
+                  <div className="flex flex-row">
+                    <span className="label-text">Activity Name</span>
+                    <Input
+                      {...register(`activities.${index}.activity`)}
+                      className={`w-2/4 ${
+                        errors?.activities != undefined &&
+                        errors?.activities[index]?.activity &&
+                        "border-error"
+                      }`}
+                    />
+                  </div>
+                  <small className="text-error">
+                    {errors.activities != undefined &&
+                      errors?.activities[index]?.activity?.message}
+                  </small>
                 </InputGroup>
                 <Divider />
               </div>
