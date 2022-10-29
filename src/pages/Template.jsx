@@ -1,14 +1,19 @@
 //React
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useLayoutEffect } from "react";
 
 //React Router
 import { useNavigate, useParams } from "react-router-dom";
 
 //Context
 import { useValuesContext } from "../context/ValuesContext";
+import { useIdContext } from "../context/IdContext";
 
 //DaisyUI
 import { Button, Divider } from "react-daisyui";
+
+//PDF
+import { toJpeg } from "html-to-image";
+import jsPDF from "jspdf";
 
 //Assets
 import map from "../assets/pin-map-fill.svg";
@@ -16,14 +21,19 @@ import envelope from "../assets/envelope-fill.svg";
 import telephone from "../assets/telephone-fill.svg";
 
 const Template = () => {
+  const TemplateRef = useRef();
   const navigate = useNavigate();
   const { id } = useParams();
-  const TemplateRef = useRef();
   const { getValues } = useValuesContext();
+  const { getId } = useIdContext();
+
+  let canGenerateImage = false;
 
   useEffect(() => {
-    if (id != ":r1:") navigate("/");
-  }, []);
+    if (id != getId()) {
+      navigate("/");
+    }
+  }, [id, getId()]);
 
   const {
     firstName,
@@ -41,31 +51,38 @@ const Template = () => {
     activities,
   } = getValues();
 
+  /* const generateImage = () => {
+    console.log("generated");
+    return URL.createObjectURL(profileImage[0]);
+  };
+
+  if (Object.keys(profileImage[0]).length === 0) {
+    window.URL.revokeObjectURL(profileImage[0]);
+  } else {
+    generateImage();
+  } */
+
   const downloadPDF = async () => {
     const template = TemplateRef.current;
-    template.id = "scale-cv";
-    let opt = {
-      margin: 1,
-      filename: `${firstName} ${lastName}'s CV.pdf`,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { format: "a4", orientation: "portrait" },
-    };
-    await html2pdf(template, opt);
-
-    setTimeout(() => {
-      template.id = "";
-    }, 3000);
+    await toJpeg(template, { quality: 1 }).then((url) => {
+      const pdf = new jsPDF();
+      const imgProps = pdf.getImageProperties(url);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      pdf.addImage(url, "JPEG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`${firstName} ${lastName}'s CV.pdf`);
+    });
   };
 
   return (
     <div data-theme="light">
       <div
         className="flex flex-col mx-auto h-auto min-h-screen"
+        data-theme="light"
         ref={TemplateRef}
       >
         {/* Name */}
-        <div className="self-start py-8 mx-12">
+        <div className="flex flex-row justify-between items-center py-10 mx-12">
           <h1 className="text-5xl font-normal">
             {firstName && firstName} {lastName && lastName}
           </h1>

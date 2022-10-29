@@ -22,8 +22,7 @@ body {
   background-blend-mode: multiply;
 }
 
-#scale-cv {
-  transition: 0.3s;
-  max-width: 210mm;
-  color: #111111;
+#profileImage {
+  width: 35mm;
+  height: 45mm;
 }

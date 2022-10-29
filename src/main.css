@@ -7701,6 +7701,10 @@ body[dir="rtl"] .\!checkbox:checked,
   width: fit-content;
 }
 
+.w-3\/12 {
+  width: 25%;
+}
+
 .w-1\/2 {
   width: 50%;
 }
@@ -7978,11 +7982,6 @@ body[dir="rtl"] .\!checkbox:checked,
   border-color: rgb(255 255 255 / var(--tw-border-opacity));
 }
 
-.border-error-content {
-  --tw-border-opacity: 1;
-  border-color: hsl(var(--erc, var(--nc)) / var(--tw-border-opacity));
-}
-
 .bg-primary {
   --tw-bg-opacity: 1;
   background-color: hsl(var(--p) / var(--tw-bg-opacity));
@@ -8017,6 +8016,11 @@ body[dir="rtl"] .\!checkbox:checked,
   background-repeat: repeat;
 }
 
+.object-cover {
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+
 .p-4 {
   padding: 1rem;
 }
@@ -8030,9 +8034,9 @@ body[dir="rtl"] .\!checkbox:checked,
   padding-right: 0.5rem;
 }
 
-.py-8 {
-  padding-top: 2rem;
-  padding-bottom: 2rem;
+.py-10 {
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
 }
 
 .px-12 {
@@ -8370,10 +8374,9 @@ body {
   background-blend-mode: multiply;
 }
 
-#scale-cv {
-  transition: 0.3s;
-  max-width: 210mm;
-  color: #111111;
+#profileImage {
+  width: 35mm;
+  height: 45mm;
 }
 
 .table tr.hover\:hover:hover:hover th, 

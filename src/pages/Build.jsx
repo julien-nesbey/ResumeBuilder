@@ -1,6 +1,3 @@
-//React
-import { useId } from "react";
-
 //Components
 import Navbar from "../components/Navbar";
 
@@ -17,6 +14,7 @@ import { ResumeValidation } from "../validations/ResumeValidation";
 
 //Context
 import { useValuesContext } from "../context/ValuesContext";
+import { useIdContext } from "../context/IdContext";
 
 //DaisyUI
 import { Input, InputGroup, Textarea, Divider, Button } from "react-daisyui";
@@ -27,7 +25,7 @@ import { countries } from "../api";
 const Build = () => {
   const navigate = useNavigate();
   const { addValues } = useValuesContext();
-  const id = useId();
+  const { getId } = useIdContext();
 
   const {
     handleSubmit,
@@ -39,8 +37,6 @@ const Build = () => {
     setValue,
   } = useForm({
     resolver: yupResolver(ResumeValidation),
-    mode: "onChange",
-    reValidateMode: "onChange",
     defaultValues: {
       academic: [
         {
@@ -64,8 +60,6 @@ const Build = () => {
   });
 
   const { errors } = formState;
-
-  useFormPersist("resumeForm", { watch, setValue });
 
   const {
     fields: AcademicFields,
@@ -116,6 +110,8 @@ const Build = () => {
     name: "activities",
   });
 
+  useFormPersist("resumeForm", { watch, setValue });
+
   const onSubmit = async (values) => {
     await addValues({
       firstName: values.firstName,
@@ -132,7 +128,7 @@ const Build = () => {
       skills: values.skills,
       activities: values.activities,
     });
-    navigate(`/preview/${id}`);
+    navigate(`/preview/${getId()}`);
   };
 
   return (
@@ -175,9 +171,7 @@ const Build = () => {
                   }`}
                   {...register("countryCode")}
                 >
-                  <option value="" selected>
-                    Select a country
-                  </option>
+                  <option value="">Select a country</option>
                   {countries.map((country, index) => {
                     let code = `+${country.callingCodes[0]}`;
                     return (
@@ -227,6 +221,7 @@ const Build = () => {
               <small className="text-error">{errors?.email?.message}</small>
             </InputGroup>
           </div>
+
           <div className="flex flex-col gap-4 my-4 sm:flex-row sm:justify-around">
             <InputGroup className="flex flex-col">
               <div className="flex flex-row">
@@ -318,7 +313,7 @@ const Build = () => {
                       errors?.academic[index]?.specialization?.message}
                   </small>
                 </InputGroup>
-                <div className="flex flex-col gap-4 my-4 sm:flex-row">
+                <div className="flex flex-col gap-4 my-4">
                   <InputGroup className="flex flex-col">
                     <div className="flex flex-row">
                       <span className="label-text">From</span>
@@ -441,7 +436,7 @@ const Build = () => {
                       errors?.experience[index]?.position?.message}
                   </small>
                 </InputGroup>
-                <div className="flex flex-col gap-4 my-4 sm:flex-row sm:justify-around">
+                <div className="flex flex-col gap-4 my-4">
                   <InputGroup className="flex flex-col">
                     <div className="flex flex-row">
                       <span className="label-text">From</span>
@@ -631,7 +626,7 @@ const Build = () => {
                 </p>
                 <InputGroup className="flex flex-col">
                   <div className="flex flex-row">
-                    <span className="label-text">Language Name</span>
+                    <span className="label-text">Language</span>
                     <Input
                       {...register(`languages.${index}.language`)}
                       className={`w-2/4 ${
@@ -653,18 +648,32 @@ const Build = () => {
                         type={"radio"}
                         value="Beginner"
                         {...register(`languages.${index}.level`)}
-                        className="w-2/4 accent-black"
+                        className="w-3/12 accent-black"
                       />
-                      <small className="text-lg font-semibold">Beginner</small>
+                      <small
+                        className={`text-lg font-semibold ${
+                          errors.languages != undefined &&
+                          errors.languages[index]?.level &&
+                          "text-error"
+                        }`}
+                      >
+                        Beginner
+                      </small>
                     </div>
                     <div className="flex flex-col w-2/4 justify-center items-center">
                       <Input
                         type={"radio"}
                         value="Intermediate"
                         {...register(`languages.${index}.level`)}
-                        className="w-2/4 accent-black"
+                        className="w-3/12 accent-black"
                       />
-                      <small className="text-lg font-semibold">
+                      <small
+                        className={`text-lg font-semibold ${
+                          errors.languages != undefined &&
+                          errors.languages[index]?.level &&
+                          "text-error"
+                        }`}
+                      >
                         Intermediate
                       </small>
                     </div>
@@ -673,24 +682,36 @@ const Build = () => {
                         type={"radio"}
                         value="Advanced"
                         {...register(`languages.${index}.level`)}
-                        className="w-2/4 outline-error accent-black"
+                        className="w-3/12 outline-error accent-black"
                       />
-                      <small className="text-lg font-semibold">Advanced</small>
+                      <small
+                        className={`text-lg font-semibold ${
+                          errors.languages != undefined &&
+                          errors.languages[index]?.level &&
+                          "text-error"
+                        }`}
+                      >
+                        Advanced
+                      </small>
                     </div>
                     <div className="flex flex-col w-2/4 justify-center items-center">
                       <Input
                         type={"radio"}
                         value="Native"
                         {...register(`languages.${index}.level`)}
-                        className="w-2/4 accent-black"
+                        className="w-3/12 accent-black"
                       />
-                      <small className="text-lg font-semibold">Native</small>
+                      <small
+                        className={`text-lg font-semibold ${
+                          errors.languages != undefined &&
+                          errors.languages[index]?.level &&
+                          "text-error"
+                        }`}
+                      >
+                        Native
+                      </small>
                     </div>
                   </div>
-                  <small className="text-error">
-                    {errors.languages != undefined &&
-                      errors?.languages[index]?.level?.message}
-                  </small>
                 </InputGroup>
                 <Divider />
               </div>
