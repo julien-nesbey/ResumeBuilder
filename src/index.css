@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -14,15 +16,15 @@ body {
 }
 
 #build-root {
-  background-image: url("./assets/Fill-in.svg");
+  background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+    url("./assets/Fill-in.svg");
   background-position: center center;
   background-repeat: no-repeat;
   background-size: contain;
   background-attachment: fixed;
-  background-blend-mode: multiply;
 }
 
-#profileImage {
-  width: 35mm;
-  height: 45mm;
+small {
+  font-size: 1.1rem;
+  font-weight: 500;
 }

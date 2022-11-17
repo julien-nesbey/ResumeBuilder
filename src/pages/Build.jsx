@@ -1,5 +1,9 @@
+//React
+import { useState, useEffect } from "react";
+
 //Components
 import Navbar from "../components/Navbar";
+import TemplateSelection from "../components/TemplateSelection";
 
 //Navigation
 import { useNavigate } from "react-router-dom";
@@ -20,12 +24,27 @@ import { useIdContext } from "../context/IdContext";
 import { Input, InputGroup, Textarea, Divider, Button } from "react-daisyui";
 
 //API
-import { countries } from "../api";
+import { countries } from "../api/api";
+import { socials } from "../api/socials";
 
 const Build = () => {
   const navigate = useNavigate();
   const { addValues } = useValuesContext();
   const { getId } = useIdContext();
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [template, setTemplate] = useState(null);
+  const [templateError, setTemplateError] = useState(false);
+
+  useEffect(() => {
+    let timeout = setTimeout(() => {
+      setTemplateError(false);
+    }, 4000);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [templateError]);
 
   const {
     handleSubmit,
@@ -37,30 +56,18 @@ const Build = () => {
     setValue,
   } = useForm({
     resolver: yupResolver(ResumeValidation),
-    defaultValues: {
-      academic: [
-        {
-          school: "",
-          degree: "",
-          specialization: "",
-          period: {
-            start: "",
-            end: "",
-          },
-          location: "",
-        },
-      ],
-      languages: [
-        {
-          language: "",
-          level: "",
-        },
-      ],
-    },
   });
 
   const { errors } = formState;
 
+  const {
+    fields: SocialFields,
+    insert: SocialInsert,
+    remove: SocialRemove,
+  } = useFieldArray({
+    control,
+    name: "socials",
+  });
   const {
     fields: AcademicFields,
     insert: AcademicInsert,
@@ -101,14 +108,6 @@ const Build = () => {
     control,
     name: "skills",
   });
-  const {
-    fields: ActivitiesFields,
-    insert: ActivitiesInsert,
-    remove: ActivitiesRemove,
-  } = useFieldArray({
-    control,
-    name: "activities",
-  });
 
   useFormPersist("resumeForm", { watch, setValue });
 
@@ -121,6 +120,7 @@ const Build = () => {
       phone: values.phone,
       address: values.address,
       profile: values.profile,
+      socials: values.socials,
       academic: values.academic,
       experience: values.experience,
       achievements: values.achievements,
@@ -128,12 +128,16 @@ const Build = () => {
       skills: values.skills,
       activities: values.activities,
     });
-    navigate(`/preview/${getId()}`);
+    if (!template) {
+      setTemplateError(true);
+      return;
+    }
+    navigate(`/preview/${getId()}/${template}`);
   };
 
   return (
     <>
-      <div id="build-root" className="px-2 mx-auto" data-theme="dark">
+      <div id="build-root" className="px-2 mx-auto overflow-hidden">
         <Navbar />
         <form onSubmit={handleSubmit(onSubmit)} name="resumeForm">
           {/* Personal Info */}
@@ -190,6 +194,7 @@ const Build = () => {
               <div className="flex flex-row">
                 <span className="label-text">Phone Number</span>
                 <Input
+                  type={"tel"}
                   className={`w-2/4 ${errors?.phone && "border-error"}`}
                   {...register("phone")}
                 />
@@ -214,6 +219,7 @@ const Build = () => {
               <div className="flex flex-row">
                 <span className="label-text">Email Address</span>
                 <Input
+                  type={"email"}
                   className={`w-2/4 ${errors?.email && "border-error"}`}
                   {...register("email")}
                 />
@@ -227,14 +233,90 @@ const Build = () => {
               <div className="flex flex-row">
                 <span className="label-text">Profile</span>
                 <Textarea
-                  rows={2}
+                  spellCheck={false}
+                  rows={3}
                   cols={150}
                   {...register("profile")}
-                  className={`${errors?.profile && "border-error"}`}
+                  className={`${errors?.profile && "border-error"} h-auto`}
                 ></Textarea>
               </div>
               <small className="text-error">{errors?.profile?.message}</small>
             </InputGroup>
+          </div>
+
+          <Divider />
+
+          {/* Socials */}
+          <h1 className="text-3xl font-bold">Socials (Optional)</h1>
+          <div className="flex flex-col my-8 h-full gap-8">
+            {SocialFields.map((field, index) => (
+              <div
+                key={field.id}
+                className="flex flex-col flex-1 h-20 w-full gap-4"
+              >
+                <p className="mb-4">
+                  <span className="bg-primary w-fit p-4 rounded-lg text-lg font-semibold mr-4">
+                    Social #{index + 1}
+                  </span>
+                  <span
+                    onClick={() => SocialRemove(index)}
+                    className="text-lg font-semibold hover:cursor-pointer"
+                  >
+                    X
+                  </span>
+                </p>
+                <div className="flex flex-col gap-4 my-4 sm:flex-row sm:justify-around">
+                  <InputGroup className="flex flex-col">
+                    <div className="flex flex-row">
+                      <span className="label-text">Platform</span>
+                      <select
+                        {...register(`socials.${index}.platform`)}
+                        className={`select w-2/4 ${
+                          errors?.socials != undefined &&
+                          errors?.socials[index]?.platform &&
+                          "border-error"
+                        }`}
+                      >
+                        <option value="">Select a Social Platform</option>
+                        {socials.map((social, idx) => (
+                          <option key={idx} value={social}>
+                            {social}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <small className="text-error">
+                      {errors?.socials != undefined &&
+                        errors?.socials[index]?.platform?.message}
+                    </small>
+                  </InputGroup>
+
+                  <InputGroup className="flex flex-col">
+                    <div className="flex flex-row">
+                      <span className="label label-text">Link</span>
+                      <Input
+                        {...register(`socials.${index}.link`)}
+                        className={`w-2/4 ${
+                          errors?.socials != undefined &&
+                          errors?.socials[index]?.link &&
+                          "border-error"
+                        }`}
+                      />
+                    </div>
+                    <small className="text-error">
+                      {errors?.socials != undefined &&
+                        errors?.socials[index]?.link?.message}
+                    </small>
+                  </InputGroup>
+                </div>
+              </div>
+            ))}
+            <Button
+              type="button"
+              onClick={() => SocialInsert(getValues().socials.length)}
+            >
+              Add Social
+            </Button>
           </div>
 
           <Divider />
@@ -648,7 +730,7 @@ const Build = () => {
                         type={"radio"}
                         value="Beginner"
                         {...register(`languages.${index}.level`)}
-                        className="w-3/12 accent-black"
+                        className="w-3/12 accent-black outline-hidden"
                       />
                       <small
                         className={`text-lg font-semibold ${
@@ -727,7 +809,7 @@ const Build = () => {
           <Divider />
 
           {/* Skills */}
-          <h1 className="text-3xl font-bold">Skills (Optional)</h1>
+          <h1 className="text-3xl font-bold">Skills (Required)</h1>
           <div className="flex flex-col my-8 h-full gap-8">
             {SkillsFields.map((field, index) => (
               <div
@@ -738,12 +820,14 @@ const Build = () => {
                   <span className="bg-primary w-fit p-4 rounded-lg text-lg font-semibold mr-4">
                     Skill #{index + 1}
                   </span>
-                  <span
-                    onClick={() => SkillsRemove(index)}
-                    className="text-lg font-semibold hover:cursor-pointer"
-                  >
-                    X
-                  </span>
+                  {index >= 1 && (
+                    <span
+                      onClick={() => SkillsRemove(index)}
+                      className="text-lg font-semibold hover:cursor-pointer"
+                    >
+                      X
+                    </span>
+                  )}
                 </p>
                 <InputGroup className="flex flex-col">
                   <div className="flex flex-row">
@@ -773,54 +857,6 @@ const Build = () => {
             </Button>
           </div>
 
-          <Divider />
-
-          {/* Activities */}
-          <h1 className="text-3xl font-bold">Activities (Optional)</h1>
-          <div className="flex flex-col my-8 h-full gap-8">
-            {ActivitiesFields.map((field, index) => (
-              <div
-                key={field.id}
-                className="flex flex-col flex-1 h-20 w-full gap-4"
-              >
-                <p className="mb-4">
-                  <span className="bg-primary w-fit p-4 rounded-lg text-lg font-semibold mr-4">
-                    Activity #{index + 1}
-                  </span>
-                  <span
-                    onClick={() => ActivitiesRemove(index)}
-                    className="text-lg font-semibold hover:cursor-pointer"
-                  >
-                    X
-                  </span>
-                </p>
-                <InputGroup className="flex flex-col">
-                  <div className="flex flex-row">
-                    <span className="label-text">Activity Name</span>
-                    <Input
-                      {...register(`activities.${index}.activity`)}
-                      className={`w-2/4 ${
-                        errors?.activities != undefined &&
-                        errors?.activities[index]?.activity &&
-                        "border-error"
-                      }`}
-                    />
-                  </div>
-                  <small className="text-error">
-                    {errors.activities != undefined &&
-                      errors?.activities[index]?.activity?.message}
-                  </small>
-                </InputGroup>
-                <Divider />
-              </div>
-            ))}
-            <Button
-              type="button"
-              onClick={() => ActivitiesInsert(getValues().activities.length)}
-            >
-              Add Activity
-            </Button>
-          </div>
           <Button type="submit" className="hidden" id="submit-btn" />
         </form>
         <div className="flex flex-row justify-center items-center">
@@ -829,12 +865,20 @@ const Build = () => {
             color="primary"
             size="lg"
             className="mx-4"
-            onClick={() => document.getElementById("submit-btn").click()}
+            onClick={() => setModalOpen((prev) => !prev)}
           >
-            Preview CV
+            Select Template
           </Button>
         </div>
       </div>
+      <TemplateSelection
+        isOpen={modalOpen}
+        className="bg-secondary"
+        handleButtonClick={() => document.getElementById("submit-btn").click()}
+        handleTemplate={(id) => setTemplate(id)}
+        onClickBackdrop={() => setModalOpen(false)}
+        error={templateError}
+      />
     </>
   );
 };

@@ -23,6 +23,12 @@ export const ResumeValidation = yup.object().shape({
     .matches("^[A-Za-z0-9+_.-]+@(.+)$", "Invalid email format"),
   address: yup.string().required("Address is required"),
   profile: yup.string().required("Profile is required"),
+  socials: yup.array().of(
+    yup.object().shape({
+      platform: yup.string().required("Social Platform is required"),
+      link: yup.string().required("Social Link is required!"),
+    })
+  ),
   academic: yup
     .array()
     .of(
@@ -72,14 +78,12 @@ export const ResumeValidation = yup.object().shape({
       })
     )
     .min(1, "1 language is required"),
-  skills: yup.array().of(
-    yup.object().shape({
-      skill: yup.string().required("Skill is required"),
-    })
-  ),
-  activities: yup.array().of(
-    yup.object().shape({
-      activity: yup.string().required("Activity is required"),
-    })
-  ),
+  skills: yup
+    .array()
+    .of(
+      yup.object().shape({
+        skill: yup.string().required("Skill is required"),
+      })
+    )
+    .min(1, "At least 1 skill is required"),
 });

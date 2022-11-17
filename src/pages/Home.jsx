@@ -9,7 +9,7 @@ import CheckCV from "../assets/Check-CV.svg";
 
 const Home = () => {
   return (
-    <div className="container flex flex-col justify-center items-center mx-auto sm:h-screen">
+    <div className="container flex flex-col justify-center items-center mx-auto select-none overflow-hidden sm:h-screen">
       <Navbar />
       <div className="flex flex-col justify-center items-center mt-10">
         <p className="mb-4 text-2xl font-semibold text-center">

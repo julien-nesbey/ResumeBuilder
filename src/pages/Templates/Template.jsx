@@ -1,12 +1,11 @@
 //React
-import { useRef, useEffect, useLayoutEffect } from "react";
+import { useRef } from "react";
 
 //React Router
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 //Context
-import { useValuesContext } from "../context/ValuesContext";
-import { useIdContext } from "../context/IdContext";
+import { useValuesContext } from "../../context/ValuesContext";
 
 //DaisyUI
 import { Button, Divider } from "react-daisyui";
@@ -16,24 +15,17 @@ import { toJpeg } from "html-to-image";
 import jsPDF from "jspdf";
 
 //Assets
-import map from "../assets/pin-map-fill.svg";
-import envelope from "../assets/envelope-fill.svg";
-import telephone from "../assets/telephone-fill.svg";
+import map from "../../assets/pin-map-fill.svg";
+import envelope from "../../assets/envelope-fill.svg";
+import telephone from "../../assets/telephone-fill.svg";
+import linkedin from "../../assets/linkedin.svg";
+import github from "../../assets/github.svg";
+import facebook from "../../assets/facebook.svg";
 
 const Template = () => {
   const TemplateRef = useRef();
   const navigate = useNavigate();
-  const { id } = useParams();
   const { getValues } = useValuesContext();
-  const { getId } = useIdContext();
-
-  let canGenerateImage = false;
-
-  useEffect(() => {
-    if (id != getId()) {
-      navigate("/");
-    }
-  }, [id, getId()]);
 
   const {
     firstName,
@@ -43,6 +35,7 @@ const Template = () => {
     email,
     address,
     profile,
+    socials,
     academic,
     experience,
     achievements,
@@ -51,20 +44,9 @@ const Template = () => {
     activities,
   } = getValues();
 
-  /* const generateImage = () => {
-    console.log("generated");
-    return URL.createObjectURL(profileImage[0]);
-  };
-
-  if (Object.keys(profileImage[0]).length === 0) {
-    window.URL.revokeObjectURL(profileImage[0]);
-  } else {
-    generateImage();
-  } */
-
   const downloadPDF = async () => {
     const template = TemplateRef.current;
-    await toJpeg(template, { quality: 1 }).then((url) => {
+    await toJpeg(template, { quality: 0.98 }).then((url) => {
       const pdf = new jsPDF();
       const imgProps = pdf.getImageProperties(url);
       const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -75,17 +57,42 @@ const Template = () => {
   };
 
   return (
-    <div data-theme="light">
+    <div>
       <div
-        className="flex flex-col mx-auto h-auto min-h-screen"
-        data-theme="light"
+        className="flex flex-col mx-auto h-auto w-screen"
+        data-theme="fantasy"
         ref={TemplateRef}
       >
         {/* Name */}
-        <div className="flex flex-row justify-between items-center py-10 mx-12">
-          <h1 className="text-5xl font-normal">
+        <div className="flex flex-col mx-12">
+          <h1 className="text-4xl font-normal py-10">
             {firstName && firstName} {lastName && lastName}
           </h1>
+          <div className="flex flex-row gap-x-4 flex-wrap w-full justify-center">
+            {socials?.map((social, index) => {
+              let platform;
+              if (social.platform.toLowerCase() == "linkedin") {
+                platform = linkedin;
+              } else if (social.platform.toLowerCase() == "github") {
+                platform = github;
+              } else if (social.platform.toLowerCase() == "facebook") {
+                platform = facebook;
+              }
+              return (
+                <div className="flex-1">
+                  <img src={platform} alt={social.platform.toLowerCase()} />
+                  <a
+                    href={social.link}
+                    target="_blank"
+                    key={index}
+                    className="link link-primary"
+                  >
+                    {social.link}
+                  </a>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         <Divider className="px-12" />
@@ -272,9 +279,18 @@ const Template = () => {
         {/* End Container */}
       </div>
       {/* End Main */}
-      <Button onClick={downloadPDF} className="mx-auto">
-        Download
-      </Button>
+      <div className="flex flex-row py-6">
+        <Button onClick={downloadPDF} className="mx-auto" color="primary">
+          Download
+        </Button>
+        <Button
+          onClick={() => navigate("/build")}
+          className="mx-auto"
+          color="primary"
+        >
+          Modify
+        </Button>
+      </div>
     </div>
   );
 };
