@@ -5,8 +5,6 @@ specifiers:
   '@vitejs/plugin-react': ^2.0.1
   autoprefixer: ^10.4.8
   daisyui: ^2.24.1
-  html-to-image: ^1.10.8
-  jspdf: ^2.5.1
   postcss: ^8.4.16
   react: ^18.2.0
   react-daisyui: ^2.3.2
@@ -14,6 +12,7 @@ specifiers:
   react-hook-form: ^7.37.0
   react-hook-form-persist: ^3.0.0
   react-router-dom: ^6.4.2
+  react-to-pdf: ^0.0.14
   tailwindcss: ^3.1.8
   uuid: ^9.0.0
   vite: ^3.0.7
@@ -22,14 +21,13 @@ specifiers:
 dependencies:
   '@hookform/resolvers': 2.9.8_react-hook-form@7.37.0
   daisyui: 2.24.1_25hquoklqeoqwmt7fwvvcyxm5e
-  html-to-image: 1.10.8
-  jspdf: 2.5.1
   react: 18.2.0
   react-daisyui: 2.3.2_syesfatqi4jn6g42y472raaqoe
   react-dom: 18.2.0_react@18.2.0
   react-hook-form: 7.37.0_react@18.2.0
   react-hook-form-persist: 3.0.0_bhffbsqk4n6q24mhpu57wdfscy
   react-router-dom: 6.4.2_biqbaboplfbrettd7655fr4n2y
+  react-to-pdf: 0.0.14_biqbaboplfbrettd7655fr4n2y
   uuid: 9.0.0
   yup: 0.32.11
 
@@ -475,6 +473,11 @@ packages:
       postcss: 8.4.16
       postcss-value-parser: 4.2.0
 
+  /base64-arraybuffer/0.1.5:
+    resolution: {integrity: sha512-437oANT9tP582zZMwSvZGy2nmSeAb8DW2me3y+Uv1Wp2Rulr8Mqlyrv3E7MLxmsiaPSMMDmiDVzgE+e8zlMx9g==}
+    engines: {node: '>= 0.6.0'}
+    dev: false
+
   /base64-arraybuffer/1.0.2:
     resolution: {integrity: sha512-I3yl4r9QB5ZRY3XuJVEPfc2XhZO6YweFPI+UovAzn+8/hb3oJ6lnysaFcjVpkCPfVWFUDvoZ8kmVDP7WyRtYtQ==}
     engines: {node: '>= 0.6.0'}
@@ -599,6 +602,12 @@ packages:
     requiresBuild: true
     dev: false
     optional: true
+
+  /css-line-break/1.0.1:
+    resolution: {integrity: sha512-Y/Us0vILnzQj21UxqoZTLaHGrePQKXcZygQIoxNmpII06LJVCgB2sFKmD7PItNDHIAqHWjrmJPVohIywWYKAmQ==}
+    dependencies:
+      base64-arraybuffer: 0.1.5
+    dev: false
 
   /css-line-break/2.1.0:
     resolution: {integrity: sha512-FHcKFCZcAha3LwfVBhCQbW2nCNbkZXn7KVUJcsT5/P8YmfsVja0FMPJr0B903j/E69HUphKiV9iQArX8SDYA4w==}
@@ -967,8 +976,11 @@ packages:
     dependencies:
       function-bind: 1.1.1
 
-  /html-to-image/1.10.8:
-    resolution: {integrity: sha512-t+JyFJwKDCp4ZwBp4iC/wqw0meQDDc77Qs8OFl5P7RGlIP3LQMvwpD7VXxqQfC7/TfC+GKYlFP6WDYfXTmXHfw==}
+  /html2canvas/1.0.0-alpha.12:
+    resolution: {integrity: sha512-+mr9jumxMQO9ZZwf7nUp3tonOIaI6tAAV0yciDMuX0tetV4wz/lFc2AxAYndxANe7/O67DKLgDLjT+ZcVUSQrw==}
+    engines: {node: '>=4.0.0'}
+    dependencies:
+      css-line-break: 1.0.1
     dev: false
 
   /html2canvas/1.4.1:
@@ -1276,6 +1288,18 @@ packages:
     dependencies:
       '@remix-run/router': 1.0.2
       react: 18.2.0
+    dev: false
+
+  /react-to-pdf/0.0.14_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-u4gwkV7Byr1uU3FgR5n99tufNgMVEYE3reyjNsYK3WuRReE1IqolYXzCoj3n/Xhk8KOFYSiS3V4xEaGFGR9H5Q==}
+    peerDependencies:
+      react: ^16.5.2
+      react-dom: ^16.5.2
+    dependencies:
+      html2canvas: 1.0.0-alpha.12
+      jspdf: 2.5.1
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
     dev: false
 
   /react/18.2.0:

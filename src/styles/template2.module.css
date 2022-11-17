@@ -21,5 +21,5 @@
 
 .template2 {
   width: 900px;
-  /* height: 1272.5px; */
+  min-height: 1272.5px;
 }

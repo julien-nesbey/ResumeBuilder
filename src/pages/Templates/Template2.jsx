@@ -11,8 +11,7 @@ import { useValuesContext } from "../../context/ValuesContext";
 import { Button } from "react-daisyui";
 
 //PDF
-import { toJpeg } from "html-to-image";
-import jsPDF from "jspdf";
+import ReactToPdf from "react-to-pdf";
 
 //Styles
 import styles from "../../styles/template2.module.css";
@@ -42,18 +41,6 @@ const Template2 = () => {
     languages,
     skills,
   } = getValues();
-
-  const downloadPDF = async () => {
-    const template = TemplateRef.current;
-    await toJpeg(template, { quality: 1 }).then((url) => {
-      const pdf = new jsPDF();
-      const imgProps = pdf.getImageProperties(url);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-      pdf.addImage(url, "JPEG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`${firstName} ${lastName}'s CV.pdf`);
-    });
-  };
 
   return (
     <div data-theme="dark" className="flex flex-col min-h-screen m-8">
@@ -126,36 +113,38 @@ const Template2 = () => {
             </div>
 
             {/* Socials */}
-            <div className="flex flex-col gap-y-4">
-              <h1 className={`mb-4 ${styles.h1}`}>Socials</h1>
-              {socials?.map((social, index) => {
-                let platform;
-                if (social.platform.toLowerCase() == "linkedin") {
-                  platform = linkedin;
-                } else if (social.platform.toLowerCase() == "github") {
-                  platform = github;
-                } else if (social.platform.toLowerCase() == "facebook") {
-                  platform = facebook;
-                }
-                return (
-                  <div>
-                    <img src={platform} alt={social.platform.toLowerCase()} />
-                    <a
-                      href={social.link}
-                      target="_blank"
-                      key={index}
-                      className="text-gray-500"
-                    >
-                      {social.link}
-                    </a>
-                  </div>
-                );
-              })}
-            </div>
+            {socials.length > 0 && (
+              <div className="flex flex-col gap-y-4">
+                <h1 className={`mb-4 ${styles.h1}`}>Socials</h1>
+                {socials?.map((social, index) => {
+                  let platform;
+                  if (social.platform.toLowerCase() == "linkedin") {
+                    platform = linkedin;
+                  } else if (social.platform.toLowerCase() == "github") {
+                    platform = github;
+                  } else if (social.platform.toLowerCase() == "facebook") {
+                    platform = facebook;
+                  }
+                  return (
+                    <div>
+                      <img src={platform} alt={social.platform.toLowerCase()} />
+                      <a
+                        href={social.link}
+                        target="_blank"
+                        key={index}
+                        className="text-gray-500"
+                      >
+                        {social.link}
+                      </a>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Right Side */}
-          <div className="flex flex-col p-4 pl-8 gap-y-8">
+          <div className="flex flex-col p-4 pl-8 gap-y-8 flex-1">
             {/* Profile */}
             <div className="flex flex-col border-b-2 gap-y-4">
               <h1 className={`${styles.h1}`}>Profile</h1>
@@ -165,33 +154,35 @@ const Template2 = () => {
             </div>
 
             {/* Experience */}
-            <div className="flex flex-col border-b-2 gap-y-4">
-              <h1 className={`${styles.h1}`}>Experience</h1>
-              <div className="flex flex-col gap-y-4 pb-8">
-                {experience.map((exp, index) => {
-                  return (
-                    <div className="flex flex-col gap-y-2" key={index}>
-                      <div className="flex flex-row justify-around">
-                        <h2 className="flex-1">{exp.company}</h2>
-                        <p>{exp.location}</p>
+            {experience.length > 0 && (
+              <div className="flex flex-col border-b-2 gap-y-4">
+                <h1 className={`${styles.h1}`}>Experience</h1>
+                <div className="flex flex-col gap-y-4 pb-8">
+                  {experience.map((exp, index) => {
+                    return (
+                      <div className="flex flex-col gap-y-2" key={index}>
+                        <div className="flex flex-row justify-around">
+                          <h2 className="flex-1">{exp.company}</h2>
+                          <p>{exp.location}</p>
+                        </div>
+                        <p>{exp.position}</p>
+                        <p>
+                          {exp.period.start} - {exp.period.end}
+                        </p>
+                        <ul className="list-disc pl-4 text-sm">
+                          {exp.duties
+                            .trim()
+                            .split(",")
+                            .map((duty, dutyIndex) => (
+                              <li key={dutyIndex}>{duty}</li>
+                            ))}
+                        </ul>
                       </div>
-                      <p>{exp.position}</p>
-                      <p>
-                        {exp.period.start} - {exp.period.end}
-                      </p>
-                      <ul className="list-disc pl-4 text-sm">
-                        {exp.duties
-                          .trim()
-                          .split(",")
-                          .map((duty, dutyIndex) => (
-                            <li key={dutyIndex}>{duty}</li>
-                          ))}
-                      </ul>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Education */}
             <div className="flex flex-col border-b-2 gap-y-4">
@@ -201,7 +192,7 @@ const Template2 = () => {
                   return (
                     <div className="flex flex-col gap-y-2" key={index}>
                       <div className="flex flex-row">
-                        <h2 className="flex-1">{edu.school}</h2>
+                        <h2 className={`flex-1 ${styles.h2}`}>{edu.school}</h2>
                         <p>{edu.location}</p>
                       </div>
                       <p>
@@ -217,30 +208,48 @@ const Template2 = () => {
             </div>
 
             {/* Achievements */}
-            <div className="flex flex-col border-b-2 gap-y-4">
-              <h1 className={`${styles.h1}`}>Achievements</h1>
-              <div className="flex flex-col gap-y-4 pb-8">
-                {achievements.map((ach, index) => {
-                  return (
-                    <div className="flex flex-col gap-y-2" key={index}>
-                      <h2 className="flex-1">{ach.achievement}</h2>
-                      <p>{ach.period}</p>
-                      <p className="text-justify text-gray-500 text-sm">
-                        {ach?.description}
-                      </p>
-                    </div>
-                  );
-                })}
+            {achievements.length > 0 && (
+              <div className="flex flex-col border-b-2 gap-y-4">
+                <h1 className={`${styles.h1}`}>Achievements</h1>
+                <div className="flex flex-col gap-y-4 pb-8">
+                  {achievements.map((ach, index) => {
+                    return (
+                      <div className="flex flex-col gap-y-2" key={index}>
+                        <h2 className={`flex-1 ${styles.h2}`}>
+                          {ach.achievement}
+                        </h2>
+                        <p>{ach.period}</p>
+                        <p className="text-justify text-gray-500 text-sm">
+                          {ach?.description}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
 
       <div className="flex flex-row py-6">
-        <Button onClick={downloadPDF} className="mx-auto" color="primary">
-          Download
-        </Button>
+        <ReactToPdf
+          targetRef={TemplateRef}
+          filename={`${firstName} ${lastName}'s CV`}
+          scale={0.8}
+          options={{
+            orientation: "portrait",
+            unit: "in",
+            format: [8.5, 11.9],
+          }}
+        >
+          {({ toPdf }) => (
+            <Button onClick={toPdf} className="mx-auto" color="primary">
+              Download
+            </Button>
+          )}
+        </ReactToPdf>
+
         <Button
           onClick={() => navigate("/build")}
           className="mx-auto"

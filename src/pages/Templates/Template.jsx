@@ -11,8 +11,7 @@ import { useValuesContext } from "../../context/ValuesContext";
 import { Button, Divider } from "react-daisyui";
 
 //PDF
-import { toJpeg } from "html-to-image";
-import jsPDF from "jspdf";
+import ReactToPdf from "react-to-pdf";
 
 //Assets
 import map from "../../assets/pin-map-fill.svg";
@@ -43,18 +42,6 @@ const Template = () => {
     skills,
     activities,
   } = getValues();
-
-  const downloadPDF = async () => {
-    const template = TemplateRef.current;
-    await toJpeg(template, { quality: 0.98 }).then((url) => {
-      const pdf = new jsPDF();
-      const imgProps = pdf.getImageProperties(url);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-      pdf.addImage(url, "JPEG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`${firstName} ${lastName}'s CV.pdf`);
-    });
-  };
 
   return (
     <div>
@@ -280,9 +267,22 @@ const Template = () => {
       </div>
       {/* End Main */}
       <div className="flex flex-row py-6">
-        <Button onClick={downloadPDF} className="mx-auto" color="primary">
-          Download
-        </Button>
+        <ReactToPdf
+          targetRef={TemplateRef}
+          filename={`${firstName} ${lastName}'s CV`}
+          scale={0.8}
+          options={{
+            orientation: "portrait",
+            unit: "in",
+            format: [8.5, 11.9],
+          }}
+        >
+          {({ toPdf }) => (
+            <Button onClick={toPdf} className="mx-auto" color="primary">
+              Download
+            </Button>
+          )}
+        </ReactToPdf>
         <Button
           onClick={() => navigate("/build")}
           className="mx-auto"
