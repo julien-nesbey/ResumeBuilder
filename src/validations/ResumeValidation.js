@@ -21,6 +21,7 @@ export const ResumeValidation = yup.object().shape({
     .email("Must be a valid email")
     .required("Email is required")
     .matches("^[A-Za-z0-9+_.-]+@(.+)$", "Invalid email format"),
+  jobTitle: yup.string().required("Job Title is required"),
   address: yup.string().required("Address is required"),
   profile: yup.string().required("Profile is required"),
   socials: yup.array().of(

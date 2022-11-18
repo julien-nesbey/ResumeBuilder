@@ -33,6 +33,7 @@ const Template2 = () => {
     phone,
     email,
     address,
+    jobTitle,
     profile,
     socials,
     academic,
@@ -53,6 +54,7 @@ const Template2 = () => {
           <h1 className={`text-5xl font-medium ${styles.name__title}`}>
             {firstName} {lastName}
           </h1>
+          <p className="text-gray-500 p-2">{jobTitle}</p>
         </div>
 
         {/* Body Container */}
@@ -126,12 +128,11 @@ const Template2 = () => {
                     platform = facebook;
                   }
                   return (
-                    <div>
+                    <div key={index}>
                       <img src={platform} alt={social.platform.toLowerCase()} />
                       <a
                         href={social.link}
                         target="_blank"
-                        key={index}
                         className="text-gray-500"
                       >
                         {social.link}

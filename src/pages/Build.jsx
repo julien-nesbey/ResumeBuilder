@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 //Components
 import Navbar from "../components/Navbar";
 import TemplateSelection from "../components/TemplateSelection";
+import { TopArrow } from "../components/TopArrow";
 
 //Navigation
 import { useNavigate } from "react-router-dom";
@@ -119,6 +120,7 @@ const Build = () => {
       countryCode: values.countryCode,
       phone: values.phone,
       address: values.address,
+      jobTitle: values.jobTitle,
       profile: values.profile,
       socials: values.socials,
       academic: values.academic,
@@ -225,6 +227,19 @@ const Build = () => {
                 />
               </div>
               <small className="text-error">{errors?.email?.message}</small>
+            </InputGroup>
+          </div>
+
+          <div className="flex flex-col gap-4 my-4 sm:flex-row sm:justify-around">
+            <InputGroup className="flex flex-col">
+              <div className="flex flex-row">
+                <span className="label-text">Job Title</span>
+                <Input
+                  className={`w-2/12 ${errors?.jobTitle && "border-error"}`}
+                  {...register("jobTitle")}
+                />
+              </div>
+              <small className="text-error">{errors?.jobTitle?.message}</small>
             </InputGroup>
           </div>
 

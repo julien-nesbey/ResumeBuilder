@@ -8,14 +8,17 @@ import { useNavigate } from "react-router-dom";
 import { useValuesContext } from "../../context/ValuesContext";
 
 //DaisyUI
-import { Button, Divider } from "react-daisyui";
+import { Button } from "react-daisyui";
 
 //PDF
 import ReactToPdf from "react-to-pdf";
 
+//Styles
+import styles from "../../styles/template.module.css";
+
 //Assets
-import map from "../../assets/pin-map-fill.svg";
 import envelope from "../../assets/envelope-fill.svg";
+import map from "../../assets/pin-map-fill.svg";
 import telephone from "../../assets/telephone-fill.svg";
 import linkedin from "../../assets/linkedin.svg";
 import github from "../../assets/github.svg";
@@ -33,6 +36,7 @@ const Template = () => {
     phone,
     email,
     address,
+    jobTitle,
     profile,
     socials,
     academic,
@@ -40,242 +44,223 @@ const Template = () => {
     achievements,
     languages,
     skills,
-    activities,
   } = getValues();
 
   return (
-    <div>
+    <div data-theme="dark" className="flex flex-col min-h-screen m-8">
       <div
-        className="flex flex-col mx-auto h-auto w-screen"
-        data-theme="fantasy"
         ref={TemplateRef}
+        className={`p-8 self-center bg-white text-zinc-800 ${styles.template}`}
       >
-        {/* Name */}
-        <div className="flex flex-col mx-12">
-          <h1 className="text-4xl font-normal py-10">
-            {firstName && firstName} {lastName && lastName}
-          </h1>
-          <div className="flex flex-row gap-x-4 flex-wrap w-full justify-center">
-            {socials?.map((social, index) => {
-              let platform;
-              if (social.platform.toLowerCase() == "linkedin") {
-                platform = linkedin;
-              } else if (social.platform.toLowerCase() == "github") {
-                platform = github;
-              } else if (social.platform.toLowerCase() == "facebook") {
-                platform = facebook;
-              }
-              return (
-                <div className="flex-1">
-                  <img src={platform} alt={social.platform.toLowerCase()} />
-                  <a
-                    href={social.link}
-                    target="_blank"
-                    key={index}
-                    className="link link-primary"
-                  >
-                    {social.link}
-                  </a>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <Divider className="px-12" />
-
-        {/* Profile */}
-        <div className="self-start py-6 mx-12 text-justify">
-          <p>{profile && profile}</p>
-        </div>
-
-        {/* Personal Info */}
-        <div className="flex flex-row bg-blue-200 text-black mx-12 justify-around items-center py-4">
-          <span className="flex flex-row gap-4 text-lg">
-            <img src={map} />
-            {address && address}
-          </span>
-          <span className="flex flex-row gap-4 text-lg">
-            <img src={envelope} />
-            {email && email}
-          </span>
-          <span className="flex flex-row gap-4 text-lg">
-            <img src={telephone} />
-            {countryCode && countryCode} {phone && phone}
-          </span>
-        </div>
-
-        {/* Education & Language Container */}
-        <div className="flex flex-row justify-between items-start mx-12 mt-8 gap-8">
-          {/* Education */}
-          <div className="flex flex-col w-full">
-            <div className="flex flex-row items-center gap-x-4">
-              <h1 className="text-2xl py-2">Education</h1>
-              <div className="h-4 w-full bg-gray-300"></div>
+        {/* Body Container */}
+        <div className="flex flex-row w-full gap-x-2">
+          {/* Left */}
+          <div className="flex flex-col w-max border-r-2 p-4">
+            {/* Name */}
+            <div className="flex flex-col text-right">
+              <h1 className="font-semibold text-4xl">
+                {firstName} {lastName}
+              </h1>
+              <p className="py-2 font-medium">{jobTitle}</p>
             </div>
 
-            {/* To be repeated */}
-            {academic?.map((item, index) => (
-              <div key={index}>
-                <div className="flex flex-col pl-8">
-                  <h3 className="font-semibold">
-                    {item.degree} - {item.specialization}
-                  </h3>
-                  <p className="py-2">{item.school}</p>
-                  <p>
-                    {item.period.start} - {item.period.end}
-                  </p>
-                </div>
-                <Divider />
+            {/* Personal Details */}
+            <div className="flex flex-col items-end gap-y-2 pt-4">
+              <div className="flex flex-row gap-x-4">
+                <p className="font-medium">{address}</p>
+                <img src={map} />
               </div>
-            ))}
-          </div>
-
-          {/* Languages */}
-          <div className="flex flex-col w-1/2">
-            <div className="flex flex-row items-center gap-x-4">
-              <h1 className="text-2xl py-2">Languages</h1>
-              <div className="h-4 w-full bg-gray-300"></div>
+              <div className="flex flex-row gap-x-4">
+                <p className="font-medium">
+                  {countryCode} {phone}
+                </p>
+                <img src={telephone} />
+              </div>
+              <div className="flex flex-row gap-x-4">
+                <p className="font-medium">{email}</p>
+                <img src={envelope} />
+              </div>
             </div>
 
-            <div className="flex flex-row pl-4 gap-4 flex-wrap">
-              {/* To be repeated */}
-              {languages?.map((language, index) => (
-                <div key={index} className="flex flex-col pl-8 w-1/3">
-                  <h3 className="font-semibold">{language.language}</h3>
-                  <p>{language.level}</p>
-                </div>
-              ))}
+            {/* Socials */}
+            <div className="flex flex-col pt-8">
+              <div className="flex flex-row items-baseline gap-x-2 pr-4">
+                <h1 className="uppercase font-bold">Socials</h1>
+                <div className="flex-1 bg-gray-300 h-3" />
+              </div>
+              <div className="flex flex-col pt-4 font-semibold gap-y-4">
+                {socials?.map((social, index) => {
+                  let platform;
+                  if (social.platform.toLowerCase() == "linkedin") {
+                    platform = linkedin;
+                  } else if (social.platform.toLowerCase() == "github") {
+                    platform = github;
+                  } else if (social.platform.toLowerCase() == "facebook") {
+                    platform = facebook;
+                  }
+                  return (
+                    <div key={index}>
+                      <img src={platform} alt={social.platform.toLowerCase()} />
+                      <a
+                        href={social.link}
+                        target="_blank"
+                        className="text-zinc-800"
+                      >
+                        {social.link}
+                      </a>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        </div>
 
-        {/* Professional Experience & Skills */}
-        <div className="flex flex-row justify-between items-start mx-12 mt-8 gap-8">
-          {/* Professional Experience */}
-          {experience?.length > 0 && (
-            <div className="flex flex-col w-full">
-              <div className="flex-flex-col w-full">
-                <div className="flex flex-row items-center gap-x-4">
-                  <h1 className="text-2xl py-2">Experience</h1>
-                  <div className="h-4 w-full bg-gray-300"></div>
-                </div>
-                {/* To be repeated */}
-                {experience.map((item, index) => (
-                  <div key={index}>
-                    <div className="flex flex-col pl-8">
-                      <h1 className="text-xl font-bold">{item?.position}</h1>
-                      <div className="flex flex-row justify-between font-semibold py-2">
+            {/* Academic */}
+            <div className="flex flex-col pt-8">
+              <div className="flex flex-row items-baseline gap-x-2 pr-4">
+                <h1 className="uppercase font-bold">Academic</h1>
+                <div className="flex-1 bg-gray-300 h-3" />
+              </div>
+              <div className="flex flex-col pt-4 font-semibold gap-y-4">
+                {academic.map((aca, index) => {
+                  return (
+                    <div key={index} className="flex flex-col pr-4 gap-y-1">
+                      <div className="flex flex-row justify-between">
+                        <h2>{aca.school}</h2>
                         <p>
-                          {item?.company} - {item?.location}
-                        </p>
-                        <p>
-                          {item?.period?.start} - {item?.period?.end}
+                          {aca.period.start} - {aca.period.end}
                         </p>
                       </div>
-                      <div className="flex flex-col">
-                        <p className="text-md font-medium underline">
-                          Main Duties
-                        </p>
-                        <ul className="list-disc pl-4 text-sm">
-                          {item.duties
-                            .trim()
-                            .split(",")
-                            .map((duty, dutyIndex) => (
-                              <li key={dutyIndex}>{duty}</li>
-                            ))}
-                        </ul>
+                      <p>
+                        {aca.degree} - {aca.specialization}
+                      </p>
+                      <p>{aca.location}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Languages */}
+            <div className="flex flex-col pt-8">
+              <div className="flex flex-row items-baseline gap-x-2 pr-4">
+                <h1 className="uppercase font-bold">Languages</h1>
+                <div className="flex-1 bg-gray-300 h-3" />
+              </div>
+              <div className="flex flex-col pt-4 font-semibold gap-y-4">
+                {languages.map((lan, index) => {
+                  return (
+                    <p key={index}>
+                      {lan.language} - {lan.level}
+                    </p>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Skills */}
+            <div className="flex flex-col pt-8">
+              <div className="flex flex-row items-baseline gap-x-2 pr-4">
+                <h1 className="uppercase font-bold">Skills</h1>
+                <div className="flex-1 bg-gray-300 h-3" />
+              </div>
+              <div className="flex flex-row flex-wrap pt-4 gap-y-4">
+                {skills.map((skill, index) => {
+                  return (
+                    <p key={index} className="w-1/2 font-semibold">
+                      {skill.skill}
+                    </p>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Right */}
+          <div className="flex flex-col p-4 gap-y-4">
+            {/* Profile */}
+            <div className="flex flex-col gap-y-2">
+              <div className="flex flex-row items-baseline gap-x-2 pr-4">
+                <h1 className="uppercase font-bold">Profile</h1>
+                <div className="flex-1 bg-gray-300 h-3" />
+              </div>
+              <p className="text-justify text-gray-500 font-medium text-sm">
+                {profile}
+              </p>
+            </div>
+
+            {/* Career */}
+            <div className="flex flex-col gap-y-2">
+              <div className="flex flex-row items-baseline gap-x-2 pr-4">
+                <h1 className="uppercase font-bold">Career</h1>
+                <div className="flex-1 bg-gray-300 h-3" />
+              </div>
+              <div className="flex flex-col px-4 gap-y-4">
+                {experience.map((exp, index) => {
+                  return (
+                    <div
+                      key={index}
+                      className="flex flex-col gap-y-2 font-medium"
+                    >
+                      <div className="flex flex-row justify-between">
+                        <p className="uppercase font-semibold">{exp.company}</p>
+                        <p>{exp.location}</p>
                       </div>
-                      <Divider />
+                      <div className="flex flex-row justify-between">
+                        <p>{exp.position}</p>
+                        <p>
+                          {exp.period.start} - {exp.period.end}
+                        </p>
+                      </div>
+                      <ul className="pl-4">
+                        {exp.duties
+                          .trim()
+                          .split(",")
+                          .map((duty, idx) => {
+                            return (
+                              <li key={idx} className="list-disc">
+                                {duty}
+                              </li>
+                            );
+                          })}
+                      </ul>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
-          )}
 
-          {/* Skills */}
-          {skills?.length > 0 && (
-            <div className="flex-flex-col w-1/2">
-              <div className="flex flex-row items-center gap-x-4">
-                <h1 className="text-2xl py-2">Skills</h1>
-                <div className="h-4 w-full bg-gray-300"></div>
+            {/* Achievements */}
+            <div className="flex flex-col gap-y-2">
+              <div className="flex flex-row items-baseline gap-x-2 pr-4">
+                <h1 className="uppercase font-bold">Achievements</h1>
+                <div className="flex-1 bg-gray-300 h-3" />
               </div>
-              <div className="flex flex-row pl-4 gap-4 flex-wrap">
-                {/* To be repeated */}
-                {skills.map((skill, index) => (
-                  <div
-                    key={index}
-                    className="basis-1/3 p-4 font-semibold text-center"
-                  >
-                    {skill?.skill}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Achievements & Activities */}
-        <div className="flex flex-row justify-between items-start mx-12 mt-8 gap-8">
-          {/* Achievements */}
-          {achievements?.length > 0 && (
-            <div className="flex flex-col w-full">
-              <div className="flex flex-row items-center gap-x-4">
-                <h1 className="text-2xl py-2">Achievements</h1>
-                <div className="h-4 w-full bg-gray-300"></div>
-              </div>
-              {/* To be repeated */}
-              {achievements.map((item, index) => (
-                <>
-                  <div key={index} className="flex flex-col py-2">
-                    <div className="flex flex-row justify-between font-semibold">
-                      <h1>{item?.achievement}</h1>
-                      <p>{item?.period}</p>
+              <div className="flex flex-col px-4 gap-y-6">
+                {achievements.map((ach, index) => {
+                  return (
+                    <div
+                      key={index}
+                      className="flex flex-col gap-y-1 font-medium"
+                    >
+                      <p className="uppercase font-semibold">
+                        {ach.achievement}
+                      </p>
+                      <p>{ach.period}</p>
+                      <p className="text-xs text-justify">{ach?.description}</p>
                     </div>
-                    <p className="text-justify mt-4">{item?.description}</p>
-                    <Divider />
-                  </div>
-                </>
-              ))}
-            </div>
-          )}
-
-          {/* Activities */}
-          {activities?.length > 0 && (
-            <div className="flex-flex-col w-1/2">
-              <div className="flex flex-row items-center gap-x-4">
-                <h1 className="text-2xl py-2">Activities</h1>
-                <div className="h-4 w-full bg-gray-300"></div>
-              </div>
-              <div className="flex flex-row pl-4 gap-4 flex-wrap">
-                {/* To be repeated */}
-                {activities.map((item, index) => (
-                  <div
-                    key={index}
-                    className="w-1/4 p-4 font-semibold text-center"
-                  >
-                    {item?.activity}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
-          )}
+          </div>
         </div>
-
-        {/* End Container */}
       </div>
-      {/* End Main */}
+
       <div className="flex flex-row py-6">
         <ReactToPdf
           targetRef={TemplateRef}
           filename={`${firstName} ${lastName}'s CV`}
-          scale={0.8}
-          options={{
-            orientation: "portrait",
-            unit: "in",
-            format: [8.5, 11.9],
-          }}
+          scale={0.9}
         >
           {({ toPdf }) => (
             <Button onClick={toPdf} className="mx-auto" color="primary">
@@ -283,6 +268,7 @@ const Template = () => {
             </Button>
           )}
         </ReactToPdf>
+
         <Button
           onClick={() => navigate("/build")}
           className="mx-auto"
