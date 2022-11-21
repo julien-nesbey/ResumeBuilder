@@ -39,7 +39,11 @@ export const ResumeValidation = yup.object().shape({
         specialization: yup.string().required("Specialization is required"),
         period: yup.object().shape({
           start: yup.string().required("Start Date is required"),
-          end: yup.string().required("End Date is required"),
+          present: yup.boolean(),
+          end: yup.string().when("present", {
+            is: false,
+            then: yup.string().required("End Date is required"),
+          }),
         }),
         location: yup.string().required("Location is required"),
       })
@@ -53,7 +57,11 @@ export const ResumeValidation = yup.object().shape({
         position: yup.string().required("Position is required"),
         period: yup.object().shape({
           start: yup.string().required("Start Date is required"),
-          end: yup.string().required("End Date is required"),
+          present: yup.boolean(),
+          end: yup.string().when("present", {
+            is: false,
+            then: yup.string().required("End Date is required"),
+          }),
         }),
         location: yup.string().required("Location is required"),
         duties: yup.string().required("At least 1 duty is required"),

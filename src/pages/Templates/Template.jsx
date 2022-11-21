@@ -10,6 +10,9 @@ import { useValuesContext } from "../../context/ValuesContext";
 //DaisyUI
 import { Button } from "react-daisyui";
 
+//Components
+import SocialChoice from "../../components/SocialChoice";
+
 //PDF
 import ReactToPdf from "react-to-pdf";
 
@@ -20,9 +23,6 @@ import styles from "../../styles/template.module.css";
 import envelope from "../../assets/envelope-fill.svg";
 import map from "../../assets/pin-map-fill.svg";
 import telephone from "../../assets/telephone-fill.svg";
-import linkedin from "../../assets/linkedin.svg";
-import github from "../../assets/github.svg";
-import facebook from "../../assets/facebook.svg";
 
 const Template = () => {
   const TemplateRef = useRef();
@@ -55,7 +55,7 @@ const Template = () => {
         {/* Body Container */}
         <div className="flex flex-row w-full gap-x-2">
           {/* Left */}
-          <div className="flex flex-col w-max border-r-2 p-4">
+          <div className="flex flex-col w-fit border-r-2 p-4">
             {/* Name */}
             <div className="flex flex-col text-right">
               <h1 className="font-semibold text-4xl">
@@ -83,36 +83,19 @@ const Template = () => {
             </div>
 
             {/* Socials */}
-            <div className="flex flex-col pt-8">
-              <div className="flex flex-row items-baseline gap-x-2 pr-4">
-                <h1 className="uppercase font-bold">Socials</h1>
-                <div className="flex-1 bg-gray-300 h-3" />
+            {socials.length > 0 ? (
+              <div className="flex flex-col pt-8">
+                <div className="flex flex-row items-baseline gap-x-2 pr-4">
+                  <h1 className="uppercase font-bold">Socials</h1>
+                  <div className="flex-1 bg-gray-300 h-3" />
+                </div>
+                <div className="flex flex-col pt-4 font-semibold gap-y-4">
+                  {socials?.map((social, index) => {
+                    return <SocialChoice social={social} key={index} />;
+                  })}
+                </div>
               </div>
-              <div className="flex flex-col pt-4 font-semibold gap-y-4">
-                {socials?.map((social, index) => {
-                  let platform;
-                  if (social.platform.toLowerCase() == "linkedin") {
-                    platform = linkedin;
-                  } else if (social.platform.toLowerCase() == "github") {
-                    platform = github;
-                  } else if (social.platform.toLowerCase() == "facebook") {
-                    platform = facebook;
-                  }
-                  return (
-                    <div key={index}>
-                      <img src={platform} alt={social.platform.toLowerCase()} />
-                      <a
-                        href={social.link}
-                        target="_blank"
-                        className="text-zinc-800"
-                      >
-                        {social.link}
-                      </a>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+            ) : null}
 
             {/* Academic */}
             <div className="flex flex-col pt-8">
@@ -120,18 +103,17 @@ const Template = () => {
                 <h1 className="uppercase font-bold">Academic</h1>
                 <div className="flex-1 bg-gray-300 h-3" />
               </div>
-              <div className="flex flex-col pt-4 font-semibold gap-y-4">
+              <div className="flex flex-col pt-4 gap-y-4">
                 {academic.map((aca, index) => {
                   return (
                     <div key={index} className="flex flex-col pr-4 gap-y-1">
-                      <div className="flex flex-row justify-between">
-                        <h2>{aca.school}</h2>
-                        <p>
-                          {aca.period.start} - {aca.period.end}
-                        </p>
-                      </div>
+                      <h2 className="flex-1 font-semibold">{aca.school}</h2>
                       <p>
                         {aca.degree} - {aca.specialization}
+                      </p>
+                      <p>
+                        {aca.period.start} -{" "}
+                        {aca.period.present ? "Present" : aca.period.end}
                       </p>
                       <p>{aca.location}</p>
                     </div>
@@ -176,7 +158,7 @@ const Template = () => {
           </div>
 
           {/* Right */}
-          <div className="flex flex-col p-4 gap-y-4">
+          <div className="flex flex-col p-4 gap-y-4 flex-1">
             {/* Profile */}
             <div className="flex flex-col gap-y-2">
               <div className="flex flex-row items-baseline gap-x-2 pr-4">
@@ -189,69 +171,78 @@ const Template = () => {
             </div>
 
             {/* Career */}
-            <div className="flex flex-col gap-y-2">
-              <div className="flex flex-row items-baseline gap-x-2 pr-4">
-                <h1 className="uppercase font-bold">Career</h1>
-                <div className="flex-1 bg-gray-300 h-3" />
-              </div>
-              <div className="flex flex-col px-4 gap-y-4">
-                {experience.map((exp, index) => {
-                  return (
-                    <div
-                      key={index}
-                      className="flex flex-col gap-y-2 font-medium"
-                    >
-                      <div className="flex flex-row justify-between">
-                        <p className="uppercase font-semibold">{exp.company}</p>
-                        <p>{exp.location}</p>
+            {experience.length > 0 ? (
+              <div className="flex flex-col gap-y-2">
+                <div className="flex flex-row items-baseline gap-x-2 pr-4">
+                  <h1 className="uppercase font-bold">Career</h1>
+                  <div className="flex-1 bg-gray-300 h-3" />
+                </div>
+                <div className="flex flex-col px-4 gap-y-4">
+                  {experience.map((exp, index) => {
+                    return (
+                      <div
+                        key={index}
+                        className="flex flex-col gap-y-2 font-medium"
+                      >
+                        <div className="flex flex-row justify-between">
+                          <p className="uppercase font-semibold">
+                            {exp.company}
+                          </p>
+                          <p>{exp.location}</p>
+                        </div>
+                        <div className="flex flex-row justify-between">
+                          <p>{exp.position}</p>
+                          <p>
+                            {exp.period.start} -{" "}
+                            {exp.period.present ? "Present" : exp.period.end}
+                          </p>
+                        </div>
+                        <ul className="pl-4">
+                          {exp.duties
+                            .trim()
+                            .split(",")
+                            .map((duty, idx) => {
+                              return (
+                                <li key={idx} className="list-disc">
+                                  {duty}
+                                </li>
+                              );
+                            })}
+                        </ul>
                       </div>
-                      <div className="flex flex-row justify-between">
-                        <p>{exp.position}</p>
-                        <p>
-                          {exp.period.start} - {exp.period.end}
-                        </p>
-                      </div>
-                      <ul className="pl-4">
-                        {exp.duties
-                          .trim()
-                          .split(",")
-                          .map((duty, idx) => {
-                            return (
-                              <li key={idx} className="list-disc">
-                                {duty}
-                              </li>
-                            );
-                          })}
-                      </ul>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            ) : null}
 
             {/* Achievements */}
-            <div className="flex flex-col gap-y-2">
-              <div className="flex flex-row items-baseline gap-x-2 pr-4">
-                <h1 className="uppercase font-bold">Achievements</h1>
-                <div className="flex-1 bg-gray-300 h-3" />
+            {achievements.length > 0 ? (
+              <div className="flex flex-col gap-y-2">
+                <div className="flex flex-row items-baseline gap-x-2 pr-4">
+                  <h1 className="uppercase font-bold">Achievements</h1>
+                  <div className="flex-1 bg-gray-300 h-3" />
+                </div>
+                <div className="flex flex-col px-4 gap-y-6">
+                  {achievements.map((ach, index) => {
+                    return (
+                      <div
+                        key={index}
+                        className="flex flex-col gap-y-1 font-medium"
+                      >
+                        <p className="uppercase font-semibold">
+                          {ach.achievement}
+                        </p>
+                        <p>{ach.period}</p>
+                        <p className="text-xs text-justify">
+                          {ach?.description}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-              <div className="flex flex-col px-4 gap-y-6">
-                {achievements.map((ach, index) => {
-                  return (
-                    <div
-                      key={index}
-                      className="flex flex-col gap-y-1 font-medium"
-                    >
-                      <p className="uppercase font-semibold">
-                        {ach.achievement}
-                      </p>
-                      <p>{ach.period}</p>
-                      <p className="text-xs text-justify">{ach?.description}</p>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+            ) : null}
           </div>
         </div>
       </div>

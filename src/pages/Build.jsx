@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 //Components
 import Navbar from "../components/Navbar";
 import TemplateSelection from "../components/TemplateSelection";
-import { TopArrow } from "../components/TopArrow";
 
 //Navigation
 import { useNavigate } from "react-router-dom";
@@ -235,7 +234,9 @@ const Build = () => {
               <div className="flex flex-row">
                 <span className="label-text">Job Title</span>
                 <Input
-                  className={`w-2/12 ${errors?.jobTitle && "border-error"}`}
+                  className={`w-2/4 ${
+                    errors?.jobTitle && "border-error"
+                  } sm:w-2/12`}
                   {...register("jobTitle")}
                 />
               </div>
@@ -429,23 +430,37 @@ const Build = () => {
                         errors?.academic[index]?.period?.start?.message}
                     </small>
                   </InputGroup>
+                  {!getValues()?.academic[index]?.period?.present ? (
+                    <InputGroup className="flex flex-col">
+                      <div className="flex flex-row">
+                        <span className="label-text">To</span>
+                        <Input
+                          type={"month"}
+                          {...register(`academic.${index}.period.end`)}
+                          className={`${
+                            errors?.academic != undefined &&
+                            errors?.academic[index]?.period?.end &&
+                            "border-error"
+                          }`}
+                        />
+                      </div>
+                      <small className="text-error">
+                        {errors.academic != undefined &&
+                          errors?.academic[index]?.period?.end?.message}
+                      </small>
+                    </InputGroup>
+                  ) : null}
+
+                  {/* Present */}
                   <InputGroup className="flex flex-col">
                     <div className="flex flex-row">
-                      <span className="label-text">To</span>
+                      <span className="label-text">Present</span>
                       <Input
-                        type={"month"}
-                        {...register(`academic.${index}.period.end`)}
-                        className={`${
-                          errors?.academic != undefined &&
-                          errors?.academic[index]?.period?.end &&
-                          "border-error"
-                        }`}
+                        type={"checkbox"}
+                        {...register(`academic.${index}.period.present`)}
+                        className="checkbox"
                       />
                     </div>
-                    <small className="text-error">
-                      {errors.academic != undefined &&
-                        errors?.academic[index]?.period?.end?.message}
-                    </small>
                   </InputGroup>
                 </div>
                 <InputGroup className="flex flex-col">
@@ -552,23 +567,37 @@ const Build = () => {
                         errors?.experience[index]?.period?.start?.message}
                     </small>
                   </InputGroup>
+                  {!getValues()?.experience[index]?.period?.present ? (
+                    <InputGroup className="flex flex-col">
+                      <div className="flex flex-row">
+                        <span className="label-text">To</span>
+                        <Input
+                          type={"month"}
+                          {...register(`experience.${index}.period.end`)}
+                          className={`${
+                            errors?.experience != undefined &&
+                            errors?.experience[index]?.period?.end &&
+                            "border-error"
+                          }`}
+                        />
+                      </div>
+                      <small className="text-error">
+                        {errors.experience != undefined &&
+                          errors?.experience[index]?.period?.end?.message}
+                      </small>
+                    </InputGroup>
+                  ) : null}
+
+                  {/* Present */}
                   <InputGroup className="flex flex-col">
                     <div className="flex flex-row">
-                      <span className="label-text">To</span>
+                      <span className="label-text">Present</span>
                       <Input
-                        type={"month"}
-                        {...register(`experience.${index}.period.end`)}
-                        className={`${
-                          errors?.experience != undefined &&
-                          errors?.experience[index]?.period?.end &&
-                          "border-error"
-                        }`}
+                        type={"checkbox"}
+                        {...register(`experience.${index}.period.present`)}
+                        className="checkbox"
                       />
                     </div>
-                    <small className="text-error">
-                      {errors.experience != undefined &&
-                        errors?.experience[index]?.period?.end?.message}
-                    </small>
                   </InputGroup>
                 </div>
                 <InputGroup className="flex flex-col">

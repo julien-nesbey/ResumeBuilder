@@ -7,6 +7,9 @@ import { useNavigate } from "react-router-dom";
 //Context
 import { useValuesContext } from "../../context/ValuesContext";
 
+//Components
+import SocialChoice from "../../components/SocialChoice";
+
 //DaisyUI
 import { Button } from "react-daisyui";
 
@@ -15,11 +18,6 @@ import ReactToPdf from "react-to-pdf";
 
 //Styles
 import styles from "../../styles/template2.module.css";
-
-//Assets
-import linkedin from "../../assets/linkedin.svg";
-import github from "../../assets/github.svg";
-import facebook from "../../assets/facebook.svg";
 
 const Template2 = () => {
   const TemplateRef = useRef();
@@ -119,26 +117,7 @@ const Template2 = () => {
               <div className="flex flex-col gap-y-4">
                 <h1 className={`mb-4 ${styles.h1}`}>Socials</h1>
                 {socials?.map((social, index) => {
-                  let platform;
-                  if (social.platform.toLowerCase() == "linkedin") {
-                    platform = linkedin;
-                  } else if (social.platform.toLowerCase() == "github") {
-                    platform = github;
-                  } else if (social.platform.toLowerCase() == "facebook") {
-                    platform = facebook;
-                  }
-                  return (
-                    <div key={index}>
-                      <img src={platform} alt={social.platform.toLowerCase()} />
-                      <a
-                        href={social.link}
-                        target="_blank"
-                        className="text-gray-500"
-                      >
-                        {social.link}
-                      </a>
-                    </div>
-                  );
+                  return <SocialChoice social={social} key={index} />;
                 })}
               </div>
             )}
@@ -168,7 +147,8 @@ const Template2 = () => {
                         </div>
                         <p>{exp.position}</p>
                         <p>
-                          {exp.period.start} - {exp.period.end}
+                          {exp.period.start} -{" "}
+                          {exp.period.present ? "Present" : exp.period.end}
                         </p>
                         <ul className="list-disc pl-4 text-sm">
                           {exp.duties
@@ -197,7 +177,8 @@ const Template2 = () => {
                         <p>{edu.location}</p>
                       </div>
                       <p>
-                        {edu.period.start} - {edu.period.end}
+                        {edu.period.start} -{" "}
+                        {edu.period.present ? "Present" : edu.period.end}
                       </p>
                       <p>
                         {edu.degree} - {edu.specialization}
