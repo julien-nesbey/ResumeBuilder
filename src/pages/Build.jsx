@@ -928,6 +928,7 @@ const Build = () => {
         handleButtonClick={() => document.getElementById("submit-btn").click()}
         handleTemplate={(id) => setTemplate(id)}
         onClickBackdrop={() => setModalOpen(false)}
+        closeModal={() => setModalOpen(false)}
         error={templateError}
       />
     </>

@@ -10,12 +10,21 @@ const TemplateSelection = ({
   handleTemplate,
   handleButtonClick,
   onClickBackdrop,
+  closeModal,
   error,
   ...props
 }) => {
   return (
     <div data-theme="fantasy" className="select-none">
       <Modal open={isOpen} onClickBackdrop={onClickBackdrop} {...props}>
+        <Button
+          size="sm"
+          shape="circle"
+          className="absolute right-2 top-2"
+          onClick={closeModal}
+        >
+          ✕
+        </Button>
         <Modal.Header className="text-center">
           <h1>Please choose your preferred template.</h1>
           {error ? (
