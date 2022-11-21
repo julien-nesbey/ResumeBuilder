@@ -2,3 +2,9 @@
   width: 900px;
   min-height: 1272.5px;
 }
+
+@media only screen and (min-width: 320px) and (max-width: 480px) {
+  .template {
+    zoom: 0.4;
+  }
+}

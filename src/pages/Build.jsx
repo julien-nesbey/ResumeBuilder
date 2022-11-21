@@ -112,6 +112,10 @@ const Build = () => {
   useFormPersist("resumeForm", { watch, setValue });
 
   const onSubmit = async (values) => {
+    if (template == null) {
+      setTemplateError(true);
+      return;
+    }
     await addValues({
       firstName: values.firstName,
       lastName: values.lastName,
@@ -129,10 +133,6 @@ const Build = () => {
       skills: values.skills,
       activities: values.activities,
     });
-    if (!template) {
-      setTemplateError(true);
-      return;
-    }
     navigate(`/preview/${getId()}/${template}`);
   };
 
@@ -234,10 +234,17 @@ const Build = () => {
               <div className="flex flex-row">
                 <span className="label-text">Job Title</span>
                 <Input
-                  className={`w-2/4 ${
-                    errors?.jobTitle && "border-error"
-                  } sm:w-2/12`}
+                  className={`w-2/4 ${errors?.jobTitle && "border-error"}`}
                   {...register("jobTitle")}
+                />
+              </div>
+              <small className="text-error">{errors?.jobTitle?.message}</small>
+            </InputGroup>
+            <InputGroup className="hidden select-none sm:flex sm:invisible">
+              <div className="flex flex-row">
+                <span className="label-text">Job Title</span>
+                <Input
+                  className={`w-2/4 ${errors?.jobTitle && "border-error"}`}
                 />
               </div>
               <small className="text-error">{errors?.jobTitle?.message}</small>
