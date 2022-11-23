@@ -1,11 +1,11 @@
 //Context
-import { useIdContext } from "../context/IdContext";
+import { useIdContext } from "../../context/IdContext";
 
 //Routes
 import { useParams, Navigate } from "react-router-dom";
 
 //API
-import { templatesApi } from "../api/templatesApi";
+import { templatesApi } from "../../api/templatesApi";
 
 const TemplateRenderer = () => {
   const { id, temp } = useParams();

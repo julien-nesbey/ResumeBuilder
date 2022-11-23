@@ -11,7 +11,7 @@ import { useValuesContext } from "../../context/ValuesContext";
 import { Button } from "react-daisyui";
 
 //Components
-import SocialChoice from "../../components/SocialChoice";
+import SocialChoice from "../../components/Template/SocialChoice";
 
 //PDF
 import ReactToPdf from "react-to-pdf";

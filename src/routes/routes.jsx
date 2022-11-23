@@ -2,7 +2,7 @@
 import { Navigate } from "react-router-dom";
 
 //Component
-import TemplateRenderer from "../components/TemplateRenderer";
+import TemplateRenderer from "../components/Template/TemplateRenderer";
 
 //Pages
 import Home from "../pages/Home";

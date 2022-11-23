@@ -3,7 +3,7 @@ import React from "react";
 import { Modal, Button } from "react-daisyui";
 
 //Template API
-import { templatesApi } from "../api/templatesApi";
+import { templatesApi } from "../../api/templatesApi";
 
 const TemplateSelection = ({
   isOpen,

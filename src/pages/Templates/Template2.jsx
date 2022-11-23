@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useValuesContext } from "../../context/ValuesContext";
 
 //Components
-import SocialChoice from "../../components/SocialChoice";
+import SocialChoice from "../../components/Template/SocialChoice";
 
 //DaisyUI
 import { Button } from "react-daisyui";

@@ -3,13 +3,20 @@ import { useState, useEffect } from "react";
 
 //Components
 import Navbar from "../components/Navbar";
-import TemplateSelection from "../components/TemplateSelection";
+import TemplateSelection from "../components/Template/TemplateSelection";
+import {
+  GroupInputText,
+  GroupInputTextArea,
+  GroupInputSelect,
+  GroupInputRadio,
+} from "../components/Build/GroupInput";
+import { GroupFormPersonalInfo } from "../components/Build/GroupForm";
 
 //Navigation
 import { useNavigate } from "react-router-dom";
 
 //Form
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import useFormPersist from "react-hook-form-persist";
 
@@ -21,7 +28,7 @@ import { useValuesContext } from "../context/ValuesContext";
 import { useIdContext } from "../context/IdContext";
 
 //DaisyUI
-import { Input, InputGroup, Textarea, Divider, Button } from "react-daisyui";
+import { InputGroup, Divider, Button } from "react-daisyui";
 
 //API
 import { countries } from "../api/api";
@@ -46,17 +53,11 @@ const Build = () => {
     };
   }, [templateError]);
 
-  const {
-    handleSubmit,
-    register,
-    control,
-    formState,
-    getValues,
-    watch,
-    setValue,
-  } = useForm({
+  const methods = useForm({
     resolver: yupResolver(ResumeValidation),
   });
+
+  const { register, control, formState, getValues, watch, setValue } = methods;
 
   const { errors } = formState;
 
@@ -140,776 +141,545 @@ const Build = () => {
     <>
       <div id="build-root" className="px-2 mx-auto overflow-hidden">
         <Navbar />
-        <form onSubmit={handleSubmit(onSubmit)} name="resumeForm">
-          {/* Personal Info */}
-          <h1 className="text-3xl font-bold">Personal Info (Required)</h1>
-          <div className="flex flex-col gap-4 my-4 sm:flex-row sm:justify-around">
-            <InputGroup className="flex flex-col">
-              <div className="flex flex-row">
-                <span className="label-text">First Name</span>
-                <Input
-                  className={`w-2/4 ${errors?.firstName && "border-error"}`}
-                  {...register("firstName")}
-                />
-              </div>
-              <small className="text-error">{errors?.firstName?.message}</small>
-            </InputGroup>
-            <InputGroup className="flex flex-col">
-              <div className="flex flex-row">
-                <span className="label-text">Last Name</span>
-                <Input
-                  className={`w-2/4 ${errors?.lastName && "border-error"}`}
-                  {...register("lastName")}
-                />
-              </div>
-              <small className="text-error">{errors?.lastName?.message}</small>
-            </InputGroup>
-          </div>
+        <FormProvider {...methods}>
+          <form onSubmit={methods.handleSubmit(onSubmit)} name="resumeForm">
+            {/* Personal Info */}
+            <h1 className="text-3xl font-bold">Personal Info (Required)</h1>
+            <GroupFormPersonalInfo title={"Personal Info (Required)"}>
+              <GroupInputText
+                title={"First Name"}
+                error={errors.firstName}
+                field={"firstName"}
+              />
 
-          <div className="flex flex-col gap-4 my-4 sm:flex-row sm:justify-around">
-            <InputGroup className="flex flex-col">
-              <div className="flex flex-row">
-                <span className="label-text">Country</span>
-                <select
-                  className={`select w-2/4 border-2 ${
-                    errors?.countryCode && "border-error"
-                  }`}
-                  {...register("countryCode")}
+              <GroupInputText
+                title={"Last Name"}
+                error={errors.lastName}
+                field={"lastName"}
+              />
+            </GroupFormPersonalInfo>
+
+            <GroupFormPersonalInfo>
+              <GroupInputSelect
+                title={"Country"}
+                field="countryCode"
+                array={countries}
+                error={errors?.countryCode}
+                children={countries.map((country, index) => {
+                  let code = `+${country.callingCodes[0]}`;
+                  return (
+                    <option key={index} value={code}>
+                      {country.name} - {code}
+                    </option>
+                  );
+                })}
+              />
+
+              <GroupInputText
+                field={"phone"}
+                title={"Phone Number"}
+                error={errors?.phone}
+                type={"tel"}
+              />
+              {/* Country */}
+            </GroupFormPersonalInfo>
+
+            <GroupFormPersonalInfo>
+              <GroupInputText
+                title={"Address"}
+                error={errors.address}
+                field={"address"}
+              />
+
+              <GroupInputText
+                title={"Email Address"}
+                error={errors?.email}
+                field="email"
+                type="email"
+              />
+            </GroupFormPersonalInfo>
+
+            <GroupFormPersonalInfo>
+              <GroupInputText
+                title={"Job Title"}
+                field="jobTitle"
+                error={errors.jobTitle}
+              />
+
+              <GroupInputText
+                title={"Profile Picture"}
+                error={errors.profilePicture}
+                field={"profilePicture"}
+              />
+            </GroupFormPersonalInfo>
+
+            <GroupFormPersonalInfo>
+              <GroupInputTextArea
+                title={"Profile"}
+                field="profile"
+                error={errors.profile}
+                cols={155}
+                rows={3}
+              />
+            </GroupFormPersonalInfo>
+
+            <Divider />
+
+            {/* Socials */}
+            <h1 className="text-3xl font-bold">Socials (Optional)</h1>
+            <div className="flex flex-col my-8 h-full gap-8">
+              {SocialFields.map((field, index) => (
+                <div
+                  key={field.id}
+                  className="flex flex-col flex-1 h-20 w-full gap-4"
                 >
-                  <option value="">Select a country</option>
-                  {countries.map((country, index) => {
-                    let code = `+${country.callingCodes[0]}`;
-                    return (
-                      <option key={index} value={code}>
-                        {country.name} - {code}
-                      </option>
-                    );
-                  })}
-                </select>
-              </div>
-              <small className="text-error">
-                {errors?.countryCode?.message}
-              </small>
-            </InputGroup>
-            <InputGroup className="flex flex-col">
-              <div className="flex flex-row">
-                <span className="label-text">Phone Number</span>
-                <Input
-                  type={"tel"}
-                  className={`w-2/4 ${errors?.phone && "border-error"}`}
-                  {...register("phone")}
-                />
-              </div>
-              <small className="text-error">{errors?.phone?.message}</small>
-            </InputGroup>
-            {/* Country */}
-          </div>
-
-          <div className="flex flex-col gap-4 my-4 sm:flex-row sm:justify-around">
-            <InputGroup className="flex flex-col">
-              <div className="flex flex-row">
-                <span className="label-text">Address</span>
-                <Input
-                  className={`w-2/4 ${errors?.address && "border-error"}`}
-                  {...register("address")}
-                />
-              </div>
-              <small className="text-error">{errors?.address?.message}</small>
-            </InputGroup>
-            <InputGroup className="flex flex-col">
-              <div className="flex flex-row">
-                <span className="label-text">Email Address</span>
-                <Input
-                  type={"email"}
-                  className={`w-2/4 ${errors?.email && "border-error"}`}
-                  {...register("email")}
-                />
-              </div>
-              <small className="text-error">{errors?.email?.message}</small>
-            </InputGroup>
-          </div>
-
-          <div className="flex flex-col gap-4 my-4 sm:flex-row sm:justify-around">
-            <InputGroup className="flex flex-col">
-              <div className="flex flex-row">
-                <span className="label-text">Job Title</span>
-                <Input
-                  className={`w-2/4 ${errors?.jobTitle && "border-error"}`}
-                  {...register("jobTitle")}
-                />
-              </div>
-              <small className="text-error">{errors?.jobTitle?.message}</small>
-            </InputGroup>
-            <InputGroup className="hidden select-none sm:flex sm:invisible">
-              <div className="flex flex-row">
-                <span className="label-text">Job Title</span>
-                <Input
-                  className={`w-2/4 ${errors?.jobTitle && "border-error"}`}
-                />
-              </div>
-              <small className="text-error">{errors?.jobTitle?.message}</small>
-            </InputGroup>
-          </div>
-
-          <div className="flex flex-col gap-4 my-4 sm:flex-row sm:justify-around">
-            <InputGroup className="flex flex-col">
-              <div className="flex flex-row">
-                <span className="label-text">Profile</span>
-                <Textarea
-                  spellCheck={false}
-                  rows={3}
-                  cols={150}
-                  {...register("profile")}
-                  className={`${errors?.profile && "border-error"} h-auto`}
-                ></Textarea>
-              </div>
-              <small className="text-error">{errors?.profile?.message}</small>
-            </InputGroup>
-          </div>
-
-          <Divider />
-
-          {/* Socials */}
-          <h1 className="text-3xl font-bold">Socials (Optional)</h1>
-          <div className="flex flex-col my-8 h-full gap-8">
-            {SocialFields.map((field, index) => (
-              <div
-                key={field.id}
-                className="flex flex-col flex-1 h-20 w-full gap-4"
-              >
-                <p className="mb-4">
-                  <span className="bg-primary w-fit p-4 rounded-lg text-lg font-semibold mr-4">
-                    Social #{index + 1}
-                  </span>
-                  <span
-                    onClick={() => SocialRemove(index)}
-                    className="text-lg font-semibold hover:cursor-pointer"
-                  >
-                    X
-                  </span>
-                </p>
-                <div className="flex flex-col gap-4 my-4 sm:flex-row sm:justify-around">
-                  <InputGroup className="flex flex-col">
-                    <div className="flex flex-row">
-                      <span className="label-text">Platform</span>
-                      <select
-                        {...register(`socials.${index}.platform`)}
-                        className={`select w-2/4 ${
-                          errors?.socials != undefined &&
-                          errors?.socials[index]?.platform &&
-                          "border-error"
-                        }`}
-                      >
-                        <option value="">Select a Social Platform</option>
-                        {socials.map((social, idx) => (
-                          <option key={idx} value={social}>
-                            {social}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <small className="text-error">
-                      {errors?.socials != undefined &&
-                        errors?.socials[index]?.platform?.message}
-                    </small>
-                  </InputGroup>
-
-                  <InputGroup className="flex flex-col">
-                    <div className="flex flex-row">
-                      <span className="label label-text">Link</span>
-                      <Input
-                        {...register(`socials.${index}.link`)}
-                        className={`w-2/4 ${
-                          errors?.socials != undefined &&
-                          errors?.socials[index]?.link &&
-                          "border-error"
-                        }`}
-                      />
-                    </div>
-                    <small className="text-error">
-                      {errors?.socials != undefined &&
-                        errors?.socials[index]?.link?.message}
-                    </small>
-                  </InputGroup>
-                </div>
-              </div>
-            ))}
-            <Button
-              type="button"
-              onClick={() => SocialInsert(getValues().socials.length)}
-            >
-              Add Social
-            </Button>
-          </div>
-
-          <Divider />
-
-          {/* Academic Achievments */}
-          <h1 className="text-3xl font-bold">
-            Academic Achievements (Required)
-          </h1>
-          <div className="flex flex-col my-8 h-full gap-8">
-            {AcademicFields.map((field, index) => (
-              <div
-                key={field.id}
-                className="flex flex-col flex-1 h-20 w-full gap-4"
-              >
-                <p className="mb-4">
-                  <span className="bg-primary w-fit p-4 rounded-lg text-lg font-semibold mr-4">
-                    Degree #{index + 1}
-                  </span>
-                  {index >= 1 && (
+                  <p className="mb-4">
+                    <span className="bg-primary w-fit p-4 rounded-lg text-lg font-semibold mr-4">
+                      Social #{index + 1}
+                    </span>
                     <span
-                      onClick={() => AcademicRemove(index)}
+                      onClick={() => SocialRemove(index)}
                       className="text-lg font-semibold hover:cursor-pointer"
                     >
                       X
                     </span>
-                  )}
-                </p>
-                <InputGroup className="flex flex-col">
-                  <div className="flex flex-row">
-                    <span className="label-text">School Name</span>
-                    <Input
-                      {...register(`academic.${index}.school`)}
-                      className={`w-2/4 ${
-                        errors?.academic != undefined &&
-                        errors?.academic[index]?.school &&
-                        "border-error"
-                      }`}
+                  </p>
+                  <GroupFormPersonalInfo>
+                    <GroupInputSelect
+                      title={"Platform"}
+                      error={
+                        errors?.socials != undefined &&
+                        errors?.socials[index]?.platform
+                      }
+                      field={`socials.${index}.platform`}
+                      children={socials.map((social, idx) => (
+                        <option key={idx} value={social}>
+                          {social}
+                        </option>
+                      ))}
                     />
-                  </div>
-                  <small className="text-error">
-                    {errors.academic != undefined &&
-                      errors?.academic[index]?.school?.message}
-                  </small>
-                </InputGroup>
-                <InputGroup className="flex flex-col">
-                  <div className="flex flex-row">
-                    <span className="label-text">Degree</span>
-                    <Input
-                      {...register(`academic.${index}.degree`)}
-                      className={`w-2/4 ${
-                        errors?.academic != undefined &&
-                        errors?.academic[index]?.degree &&
-                        "border-error"
-                      }`}
+
+                    <GroupInputText
+                      title={"Link"}
+                      error={
+                        errors?.socials != undefined &&
+                        errors?.socials[index]?.link
+                      }
+                      field={`socials.${index}.link`}
                     />
-                  </div>
-                  <small className="text-error">
-                    {errors.academic != undefined &&
-                      errors?.academic[index]?.degree?.message}
-                  </small>
-                </InputGroup>
-                <InputGroup className="flex flex-col">
-                  <div className="flex flex-row">
-                    <span className="label-text">Specialization</span>
-                    <Input
-                      {...register(`academic.${index}.specialization`)}
-                      className={`w-2/4 ${
+                  </GroupFormPersonalInfo>
+                </div>
+              ))}
+              <Button
+                type="button"
+                onClick={() => SocialInsert(getValues().socials.length)}
+              >
+                Add Social
+              </Button>
+            </div>
+
+            <Divider />
+
+            {/* Academic Achievments */}
+            <h1 className="text-3xl font-bold">
+              Academic Achievements (Required)
+            </h1>
+            <div className="flex flex-col my-8 h-full gap-8">
+              {AcademicFields.map((field, index) => (
+                <div
+                  key={field.id}
+                  className="flex flex-col flex-1 h-20 w-full gap-4"
+                >
+                  <p className="mb-4">
+                    <span className="bg-primary w-fit p-4 rounded-lg text-lg font-semibold mr-4">
+                      Degree #{index + 1}
+                    </span>
+                    {index >= 1 && (
+                      <span
+                        onClick={() => AcademicRemove(index)}
+                        className="text-lg font-semibold hover:cursor-pointer"
+                      >
+                        X
+                      </span>
+                    )}
+                  </p>
+
+                  <GroupInputText
+                    title={"School Name"}
+                    field={`academic.${index}.school`}
+                    error={
+                      errors?.academic != undefined &&
+                      errors?.academic[index]?.school
+                    }
+                  />
+
+                  <GroupInputText
+                    title={"Degree"}
+                    field={`academic.${index}.degree`}
+                    error={
+                      errors?.academic != undefined &&
+                      errors?.academic[index]?.degree
+                    }
+                  />
+
+                  <GroupInputText
+                    title={"Specialization"}
+                    field={`academic.${index}.specialization`}
+                    error={
+                      errors?.academic != undefined &&
+                      errors?.academic[index]?.specialization
+                    }
+                  />
+
+                  <div className="flex flex-col gap-4 my-4">
+                    <GroupInputText
+                      title={"From"}
+                      type="month"
+                      field={`academic.${index}.period.start`}
+                      error={
                         errors?.academic != undefined &&
-                        errors?.academic[index]?.specialization &&
-                        "border-error"
-                      }`}
+                        errors?.academic[index]?.period?.start
+                      }
                     />
-                  </div>
-                  <small className="text-error">
-                    {errors.academic != undefined &&
-                      errors?.academic[index]?.specialization?.message}
-                  </small>
-                </InputGroup>
-                <div className="flex flex-col gap-4 my-4">
-                  <InputGroup className="flex flex-col">
-                    <div className="flex flex-row">
-                      <span className="label-text">From</span>
-                      <Input
-                        type={"month"}
-                        {...register(`academic.${index}.period.start`)}
-                        className={`${
+
+                    {!getValues()?.academic[index]?.period?.present ? (
+                      <GroupInputText
+                        title={"To"}
+                        type="month"
+                        field={`academic.${index}.period.end`}
+                        error={
                           errors?.academic != undefined &&
-                          errors?.academic[index]?.period?.start &&
-                          "border-error"
-                        }`}
+                          errors?.academic[index]?.period?.end
+                        }
                       />
-                    </div>
-                    <small className="text-error">
-                      {errors.academic != undefined &&
-                        errors?.academic[index]?.period?.start?.message}
-                    </small>
-                  </InputGroup>
-                  {!getValues()?.academic[index]?.period?.present ? (
-                    <InputGroup className="flex flex-col">
-                      <div className="flex flex-row">
-                        <span className="label-text">To</span>
-                        <Input
-                          type={"month"}
-                          {...register(`academic.${index}.period.end`)}
-                          className={`${
-                            errors?.academic != undefined &&
-                            errors?.academic[index]?.period?.end &&
-                            "border-error"
-                          }`}
-                        />
-                      </div>
-                      <small className="text-error">
-                        {errors.academic != undefined &&
-                          errors?.academic[index]?.period?.end?.message}
-                      </small>
-                    </InputGroup>
-                  ) : null}
+                    ) : null}
 
-                  {/* Present */}
-                  <InputGroup className="flex flex-col">
-                    <div className="flex flex-row">
-                      <span className="label-text">Present</span>
-                      <Input
-                        type={"checkbox"}
-                        {...register(`academic.${index}.period.present`)}
-                        className="checkbox"
-                      />
-                    </div>
-                  </InputGroup>
-                </div>
-                <InputGroup className="flex flex-col">
-                  <div className="flex flex-row">
-                    <span className="label-text">Location</span>
-                    <Input
-                      {...register(`academic.${index}.location`)}
-                      className={`w-2/4 ${
+                    <GroupInputText
+                      title={"Present"}
+                      type="checkbox"
+                      field={`academic.${index}.period.present`}
+                      error={
                         errors?.academic != undefined &&
-                        errors?.academic[index]?.location &&
-                        "border-error"
-                      }`}
+                        errors?.academic[index]?.period?.present
+                      }
                     />
                   </div>
-                  <small className="text-error">
-                    {errors.academic != undefined &&
-                      errors?.academic[index]?.location?.message}
-                  </small>
-                </InputGroup>
-                <Divider />
-              </div>
-            ))}
-            <Button
-              type="button"
-              onClick={() => AcademicInsert(getValues().academic.length)}
-            >
-              Add Degree
-            </Button>
-          </div>
-
-          <Divider />
-
-          {/* Professional Experience */}
-          <h1 className="text-3xl font-bold">
-            Professional Experience (Optional)
-          </h1>
-          <div className="flex flex-col my-8 h-full gap-8">
-            {ExperienceFields.map((field, index) => (
-              <div
-                key={field.id}
-                className="flex flex-col flex-1 h-20 w-full gap-4"
-              >
-                <p className="mb-4">
-                  <span className="bg-primary w-fit p-4 rounded-lg text-lg font-semibold mr-4">
-                    Experience #{index + 1}
-                  </span>
-                  <span
-                    onClick={() => ExperienceRemove(index)}
-                    className="text-lg font-semibold hover:cursor-pointer"
-                  >
-                    X
-                  </span>
-                </p>
-                <InputGroup className="flex flex-col">
-                  <div className="flex flex-row">
-                    <span className="label-text">Company Name</span>
-                    <Input
-                      {...register(`experience.${index}.company`)}
-                      className={`w-2/4 ${
-                        errors?.experience != undefined &&
-                        errors?.experience[index]?.company &&
-                        "border-error"
-                      }`}
-                    />
-                  </div>
-                  <small className="text-error">
-                    {errors.experience != undefined &&
-                      errors?.experience[index]?.company?.message}
-                  </small>
-                </InputGroup>
-                <InputGroup className="flex flex-col">
-                  <div className="flex flex-row">
-                    <span className="label-text">Position</span>
-                    <Input
-                      {...register(`experience.${index}.position`)}
-                      className={`w-2/4 ${
-                        errors?.experience != undefined &&
-                        errors?.experience[index]?.position &&
-                        "border-error"
-                      }`}
-                    />
-                  </div>
-                  <small className="text-error">
-                    {errors.experience != undefined &&
-                      errors?.experience[index]?.position?.message}
-                  </small>
-                </InputGroup>
-                <div className="flex flex-col gap-4 my-4">
-                  <InputGroup className="flex flex-col">
-                    <div className="flex flex-row">
-                      <span className="label-text">From</span>
-                      <Input
-                        type={"month"}
-                        {...register(`experience.${index}.period.start`)}
-                        className={`${
-                          errors?.experience != undefined &&
-                          errors?.experience[index]?.period?.start &&
-                          "border-error"
-                        }`}
-                      />
-                    </div>
-                    <small className="text-error">
-                      {errors.experience != undefined &&
-                        errors?.experience[index]?.period?.start?.message}
-                    </small>
-                  </InputGroup>
-                  {!getValues()?.experience[index]?.period?.present ? (
-                    <InputGroup className="flex flex-col">
-                      <div className="flex flex-row">
-                        <span className="label-text">To</span>
-                        <Input
-                          type={"month"}
-                          {...register(`experience.${index}.period.end`)}
-                          className={`${
-                            errors?.experience != undefined &&
-                            errors?.experience[index]?.period?.end &&
-                            "border-error"
-                          }`}
-                        />
-                      </div>
-                      <small className="text-error">
-                        {errors.experience != undefined &&
-                          errors?.experience[index]?.period?.end?.message}
-                      </small>
-                    </InputGroup>
-                  ) : null}
-
-                  {/* Present */}
-                  <InputGroup className="flex flex-col">
-                    <div className="flex flex-row">
-                      <span className="label-text">Present</span>
-                      <Input
-                        type={"checkbox"}
-                        {...register(`experience.${index}.period.present`)}
-                        className="checkbox"
-                      />
-                    </div>
-                  </InputGroup>
+                  <GroupInputText
+                    title={"Location"}
+                    field={`academic.${index}.location`}
+                    error={
+                      errors?.academic != undefined &&
+                      errors?.academic[index]?.location
+                    }
+                  />
+                  <Divider />
                 </div>
-                <InputGroup className="flex flex-col">
-                  <div className="flex flex-row">
-                    <span className="label-text">Location</span>
-                    <Input
-                      {...register(`experience.${index}.location`)}
-                      className={`w-2/4 ${
-                        errors?.experience != undefined &&
-                        errors?.experience[index]?.location &&
-                        "border-error"
-                      }`}
-                    />
-                  </div>
-                  <small className="text-error">
-                    {errors.experience != undefined &&
-                      errors?.experience[index]?.location?.message}
-                  </small>
-                </InputGroup>
-                <InputGroup className="flex flex-col">
-                  <div className="flex flex-row">
-                    <span className="label-text">Main Duties</span>
-                    <Textarea
-                      rows={3}
-                      cols={100}
-                      placeholder="Separate with commas (,)"
-                      {...register(`experience.${index}.duties`)}
-                      className={`${
-                        errors?.experience != undefined &&
-                        errors?.experience[index]?.duties &&
-                        "border-error"
-                      }`}
-                    ></Textarea>
-                  </div>
-                  <small className="text-error">
-                    {errors.experience != undefined &&
-                      errors?.experience[index]?.duties?.message}
-                  </small>
-                </InputGroup>
-                <Divider />
-              </div>
-            ))}
-            <Button
-              type="button"
-              onClick={() => ExperienceInsert(getValues().experience.length)}
-            >
-              Add Experience
-            </Button>
-          </div>
-
-          <Divider />
-
-          {/* Achievements */}
-          <h1 className="text-3xl font-bold">Achievements (Optional)</h1>
-          <div className="flex flex-col my-8 h-full gap-8">
-            {AchievementsFields.map((field, index) => (
-              <div
-                key={field.id}
-                className="flex flex-col flex-1 h-20 w-full gap-4"
+              ))}
+              <Button
+                type="button"
+                onClick={() => AcademicInsert(getValues().academic.length)}
               >
-                <p className="mb-4">
-                  <span className="bg-primary w-fit p-4 rounded-lg text-lg font-semibold mr-4">
-                    Achievement #{index + 1}
-                  </span>
-                  <span
-                    onClick={() => AchievementsRemove(index)}
-                    className="text-lg font-semibold hover:cursor-pointer"
-                  >
-                    X
-                  </span>
-                </p>
-                <InputGroup className="flex flex-col">
-                  <div className="flex flex-row">
-                    <span className="label-text">Achievement Name</span>
-                    <Input
-                      {...register(`achievements.${index}.achievement`)}
-                      className={`w-2/4 ${
-                        errors?.achievements != undefined &&
-                        errors?.achievements[index]?.achievement &&
-                        "border-error"
-                      }`}
-                    />
-                  </div>
-                  <small className="text-error">
-                    {errors.achievements != undefined &&
-                      errors?.achievements[index]?.achievement?.message}
-                  </small>
-                </InputGroup>
-                <InputGroup className="flex flex-col">
-                  <div className="flex flex-row">
-                    <span className="label-text">Period</span>
-                    <Input
-                      type={"month"}
-                      {...register(`achievements.${index}.period`)}
-                      className={`w-2/4 ${
-                        errors?.achievements != undefined &&
-                        errors?.achievements[index]?.period &&
-                        "border-error"
-                      }`}
-                    />
-                  </div>
-                  <small className="text-error">
-                    {errors.achievements != undefined &&
-                      errors?.achievements[index]?.period?.message}
-                  </small>
-                </InputGroup>
-                <InputGroup className="flex flex-col">
-                  <div className="flex flex-row">
-                    <span className="label-text">Description (Optional)</span>
-                    <Textarea
-                      cols={100}
-                      rows={3}
-                      {...register(`achievements.${index}.description`)}
-                    ></Textarea>
-                  </div>
-                </InputGroup>
-                <Divider />
-              </div>
-            ))}
-            <Button
-              type="button"
-              onClick={() =>
-                AchievementsInsert(getValues().achievements.length)
-              }
-            >
-              Add Achievement
-            </Button>
-          </div>
+                Add Degree
+              </Button>
+            </div>
 
-          <Divider />
+            <Divider />
 
-          {/* Languages */}
-          <h1 className="text-3xl font-bold">Languages (Required)</h1>
-          <div className="flex flex-col my-8 h-full gap-8">
-            {LanguageFields.map((field, index) => (
-              <div
-                key={field.id}
-                className="flex flex-col flex-1 h-20 w-full gap-4"
-              >
-                <p className="mb-4">
-                  <span className="bg-primary w-fit p-4 rounded-lg text-lg font-semibold mr-4">
-                    Language #{index + 1}
-                  </span>
-                  {index >= 1 && (
+            {/* Professional Experience */}
+            <h1 className="text-3xl font-bold">
+              Professional Experience (Optional)
+            </h1>
+            <div className="flex flex-col my-8 h-full gap-8">
+              {ExperienceFields.map((field, index) => (
+                <div
+                  key={field.id}
+                  className="flex flex-col flex-1 h-20 w-full gap-4"
+                >
+                  <p className="mb-4">
+                    <span className="bg-primary w-fit p-4 rounded-lg text-lg font-semibold mr-4">
+                      Experience #{index + 1}
+                    </span>
                     <span
-                      onClick={() => LanguageRemove(index)}
+                      onClick={() => ExperienceRemove(index)}
                       className="text-lg font-semibold hover:cursor-pointer"
                     >
                       X
                     </span>
-                  )}
-                </p>
-                <InputGroup className="flex flex-col">
-                  <div className="flex flex-row">
-                    <span className="label-text">Language</span>
-                    <Input
-                      {...register(`languages.${index}.language`)}
-                      className={`w-2/4 ${
-                        errors?.languages != undefined &&
-                        errors?.languages[index]?.language &&
-                        "border-error"
-                      }`}
+                  </p>
+                  <GroupInputText
+                    title={"Company Name"}
+                    field={`experience.${index}.company`}
+                    error={
+                      errors?.experience != undefined &&
+                      errors?.experience[index]?.company
+                    }
+                  />
+
+                  <GroupInputText
+                    title={"Position"}
+                    field={`experience.${index}.position`}
+                    error={
+                      errors?.experience != undefined &&
+                      errors?.experience[index]?.position
+                    }
+                  />
+
+                  <div className="flex flex-col gap-4 my-4">
+                    <GroupInputText
+                      title={"From"}
+                      type="month"
+                      field={`experience.${index}.period.start`}
+                      error={
+                        errors?.experience != undefined &&
+                        errors?.experience[index]?.period?.start
+                      }
+                    />
+
+                    {!getValues()?.experience[index]?.period?.present ? (
+                      <GroupInputText
+                        title={"To"}
+                        type="month"
+                        field={`experience.${index}.period.end`}
+                        error={
+                          errors?.experience != undefined &&
+                          errors?.experience[index]?.period?.end
+                        }
+                      />
+                    ) : null}
+
+                    {/* Present */}
+                    <GroupInputText
+                      title={"Present"}
+                      type="checkbox"
+                      field={`experience.${index}.period.present`}
+                      error={
+                        errors?.experience != undefined &&
+                        errors?.experience[index]?.period?.present
+                      }
                     />
                   </div>
-                  <small className="text-error">
-                    {errors.languages != undefined &&
-                      errors?.languages[index]?.language?.message}
-                  </small>
-                </InputGroup>
-                <InputGroup className="flex flex-col">
-                  <div className="flex flex-row w-full">
-                    <div className="flex flex-col w-2/4 justify-center items-center">
-                      <Input
-                        type={"radio"}
-                        value="Beginner"
-                        {...register(`languages.${index}.level`)}
-                        className="w-3/12 accent-black outline-hidden"
-                      />
-                      <small
-                        className={`text-lg font-semibold ${
-                          errors.languages != undefined &&
-                          errors.languages[index]?.level &&
-                          "text-error"
-                        }`}
-                      >
-                        Beginner
-                      </small>
-                    </div>
-                    <div className="flex flex-col w-2/4 justify-center items-center">
-                      <Input
-                        type={"radio"}
-                        value="Intermediate"
-                        {...register(`languages.${index}.level`)}
-                        className="w-3/12 accent-black"
-                      />
-                      <small
-                        className={`text-lg font-semibold ${
-                          errors.languages != undefined &&
-                          errors.languages[index]?.level &&
-                          "text-error"
-                        }`}
-                      >
-                        Intermediate
-                      </small>
-                    </div>
-                    <div className="flex flex-col w-2/4 justify-center items-center">
-                      <Input
-                        type={"radio"}
-                        value="Advanced"
-                        {...register(`languages.${index}.level`)}
-                        className="w-3/12 outline-error accent-black"
-                      />
-                      <small
-                        className={`text-lg font-semibold ${
-                          errors.languages != undefined &&
-                          errors.languages[index]?.level &&
-                          "text-error"
-                        }`}
-                      >
-                        Advanced
-                      </small>
-                    </div>
-                    <div className="flex flex-col w-2/4 justify-center items-center">
-                      <Input
-                        type={"radio"}
-                        value="Native"
-                        {...register(`languages.${index}.level`)}
-                        className="w-3/12 accent-black"
-                      />
-                      <small
-                        className={`text-lg font-semibold ${
-                          errors.languages != undefined &&
-                          errors.languages[index]?.level &&
-                          "text-error"
-                        }`}
-                      >
-                        Native
-                      </small>
-                    </div>
-                  </div>
-                </InputGroup>
-                <Divider />
-              </div>
-            ))}
-            <Button
-              type="button"
-              onClick={() => LanguageInsert(getValues().languages.length)}
-            >
-              Add Language
-            </Button>
-          </div>
 
-          <Divider />
+                  <GroupInputText
+                    title={"Location"}
+                    field={`experience.${index}.location`}
+                    error={
+                      errors?.experience != undefined &&
+                      errors?.experience[index]?.location
+                    }
+                  />
 
-          {/* Skills */}
-          <h1 className="text-3xl font-bold">Skills (Required)</h1>
-          <div className="flex flex-col my-8 h-full gap-8">
-            {SkillsFields.map((field, index) => (
-              <div
-                key={field.id}
-                className="flex flex-col flex-1 h-20 w-full gap-4"
+                  <GroupInputTextArea
+                    title={"Main Duties"}
+                    field={`experience.${index}.duties`}
+                    rows={3}
+                    cols={100}
+                    placeholder="Separate duties with commas (,)"
+                    error={
+                      errors?.experience != undefined &&
+                      errors?.experience[index]?.duties
+                    }
+                  />
+
+                  <Divider />
+                </div>
+              ))}
+              <Button
+                type="button"
+                onClick={() => ExperienceInsert(getValues().experience.length)}
               >
-                <p className="mb-4">
-                  <span className="bg-primary w-fit p-4 rounded-lg text-lg font-semibold mr-4">
-                    Skill #{index + 1}
-                  </span>
-                  {index >= 1 && (
+                Add Experience
+              </Button>
+            </div>
+
+            <Divider />
+
+            {/* Achievements */}
+            <h1 className="text-3xl font-bold">Achievements (Optional)</h1>
+            <div className="flex flex-col my-8 h-full gap-8">
+              {AchievementsFields.map((field, index) => (
+                <div
+                  key={field.id}
+                  className="flex flex-col flex-1 h-20 w-full gap-4"
+                >
+                  <p className="mb-4">
+                    <span className="bg-primary w-fit p-4 rounded-lg text-lg font-semibold mr-4">
+                      Achievement #{index + 1}
+                    </span>
                     <span
-                      onClick={() => SkillsRemove(index)}
+                      onClick={() => AchievementsRemove(index)}
                       className="text-lg font-semibold hover:cursor-pointer"
                     >
                       X
                     </span>
-                  )}
-                </p>
-                <InputGroup className="flex flex-col">
-                  <div className="flex flex-row">
-                    <span className="label-text">Skill</span>
-                    <Input
-                      {...register(`skills.${index}.skill`)}
-                      className={`w-2/4 ${
-                        errors?.skills != undefined &&
-                        errors?.skills[index]?.skill &&
-                        "border-error"
-                      }`}
-                    />
-                  </div>
-                  <small className="text-error">
-                    {errors.skills != undefined &&
-                      errors?.skills[index]?.skill?.message}
-                  </small>
-                </InputGroup>
-                <Divider />
-              </div>
-            ))}
-            <Button
-              type="button"
-              onClick={() => SkillsInsert(getValues().skills.length)}
-            >
-              Add Skill
-            </Button>
-          </div>
+                  </p>
+                  <GroupInputText
+                    title={"Achievement Name"}
+                    field={`achievements.${index}.achievement`}
+                    error={
+                      errors?.achievements != undefined &&
+                      errors?.achievements[index]?.achievement
+                    }
+                  />
 
-          <Button type="submit" className="hidden" id="submit-btn" />
-        </form>
+                  <GroupInputText
+                    title={"Period"}
+                    type={"month"}
+                    field={`achievements.${index}.period`}
+                    error={
+                      errors?.achievements != undefined &&
+                      errors?.achievements[index]?.period
+                    }
+                  />
+
+                  <GroupInputTextArea
+                    title={"Description (Optional)"}
+                    field={`achievements.${index}.description`}
+                    placeholder="Describe your achievement in a simplified way."
+                    rows={3}
+                    cols={100}
+                  />
+
+                  <Divider />
+                </div>
+              ))}
+              <Button
+                type="button"
+                onClick={() =>
+                  AchievementsInsert(getValues().achievements.length)
+                }
+              >
+                Add Achievement
+              </Button>
+            </div>
+
+            <Divider />
+
+            {/* Languages */}
+            <h1 className="text-3xl font-bold">Languages (Required)</h1>
+            <div className="flex flex-col my-8 h-full gap-8">
+              {LanguageFields.map((field, index) => (
+                <div
+                  key={field.id}
+                  className="flex flex-col flex-1 h-20 w-full gap-4"
+                >
+                  <p className="mb-4">
+                    <span className="bg-primary w-fit p-4 rounded-lg text-lg font-semibold mr-4">
+                      Language #{index + 1}
+                    </span>
+                    {index >= 1 && (
+                      <span
+                        onClick={() => LanguageRemove(index)}
+                        className="text-lg font-semibold hover:cursor-pointer"
+                      >
+                        X
+                      </span>
+                    )}
+                  </p>
+                  <GroupInputText
+                    title={"Language"}
+                    field={`languages.${index}.language`}
+                    error={
+                      errors?.languages != undefined &&
+                      errors?.languages[index]?.language
+                    }
+                  />
+                  <InputGroup className="flex flex-col">
+                    <div className="flex flex-row w-full">
+                      <GroupInputRadio
+                        title={"Beginner"}
+                        field={`languages.${index}.level`}
+                        value={"Beginner"}
+                        error={
+                          errors?.languages != undefined &&
+                          errors?.languages[index]?.level
+                        }
+                      />
+
+                      <GroupInputRadio
+                        title={"Intermediate"}
+                        field={`languages.${index}.level`}
+                        value={"Intermediate"}
+                        error={
+                          errors?.languages != undefined &&
+                          errors?.languages[index]?.level
+                        }
+                      />
+                      <GroupInputRadio
+                        title={"Advanced"}
+                        field={`languages.${index}.level`}
+                        value={"Advanced"}
+                        error={
+                          errors?.languages != undefined &&
+                          errors?.languages[index]?.level
+                        }
+                      />
+                      <GroupInputRadio
+                        title={"Native"}
+                        field={`languages.${index}.level`}
+                        value={"Native"}
+                        error={
+                          errors?.languages != undefined &&
+                          errors?.languages[index]?.level
+                        }
+                      />
+                    </div>
+                  </InputGroup>
+                  <Divider />
+                </div>
+              ))}
+              <Button
+                type="button"
+                onClick={() => LanguageInsert(getValues().languages.length)}
+              >
+                Add Language
+              </Button>
+            </div>
+
+            <Divider />
+
+            {/* Skills */}
+            <h1 className="text-3xl font-bold">Skills (Required)</h1>
+            <div className="flex flex-col my-8 h-full gap-8">
+              {SkillsFields.map((field, index) => (
+                <div
+                  key={field.id}
+                  className="flex flex-col flex-1 h-20 w-full gap-4"
+                >
+                  <p className="mb-4">
+                    <span className="bg-primary w-fit p-4 rounded-lg text-lg font-semibold mr-4">
+                      Skill #{index + 1}
+                    </span>
+                    {index >= 1 && (
+                      <span
+                        onClick={() => SkillsRemove(index)}
+                        className="text-lg font-semibold hover:cursor-pointer"
+                      >
+                        X
+                      </span>
+                    )}
+                  </p>
+                  <GroupInputText
+                    title={"Skill"}
+                    field={`skills.${index}.skill`}
+                    error={
+                      errors?.skills != undefined &&
+                      errors?.skills[index]?.skill
+                    }
+                  />
+                  <Divider />
+                </div>
+              ))}
+              <Button
+                type="button"
+                onClick={() => SkillsInsert(getValues().skills.length)}
+              >
+                Add Skill
+              </Button>
+            </div>
+
+            <Button type="submit" className="hidden" id="submit-btn" />
+          </form>
+        </FormProvider>
         <div className="flex flex-row justify-center items-center">
           <Button
             type="button"
