@@ -24,6 +24,12 @@
   min-height: 1272.5px;
 }
 
+.profilePicture {
+  width: 25%;
+  aspect-ratio: 3/2;
+  object-fit: contain;
+}
+
 @media only screen and (min-width: 320px) and (max-width: 480px) {
   .template2 {
     zoom: 0.4;

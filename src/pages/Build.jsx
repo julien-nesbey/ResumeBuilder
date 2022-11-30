@@ -9,6 +9,7 @@ import {
   GroupInputTextArea,
   GroupInputSelect,
   GroupInputRadio,
+  GroupInputFile,
 } from "../components/Build/GroupInput";
 import { GroupFormPersonalInfo } from "../components/Build/GroupForm";
 
@@ -57,7 +58,7 @@ const Build = () => {
     resolver: yupResolver(ResumeValidation),
   });
 
-  const { register, control, formState, getValues, watch, setValue } = methods;
+  const { control, formState, getValues, watch, setValue } = methods;
 
   const { errors } = formState;
 
@@ -204,12 +205,7 @@ const Build = () => {
                 title={"Job Title"}
                 field="jobTitle"
                 error={errors.jobTitle}
-              />
-
-              <GroupInputText
-                title={"Profile Picture"}
-                error={errors.profilePicture}
-                field={"profilePicture"}
+                className="sm:w-1/4"
               />
             </GroupFormPersonalInfo>
 

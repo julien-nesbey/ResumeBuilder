@@ -28,3 +28,11 @@ small {
   font-size: 1.1rem;
   font-weight: 500;
 }
+
+::-webkit-file-upload-button {
+  display: none;
+}
+
+::file-selector-button {
+  display: none;
+}
