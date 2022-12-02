@@ -32,7 +32,7 @@ import { useIdContext } from "../context/IdContext";
 import { InputGroup, Divider, Button } from "react-daisyui";
 
 //API
-import { countries } from "../api/api";
+import { countries } from "../api/countries";
 import { socials } from "../api/socials";
 
 const Build = () => {

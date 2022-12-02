@@ -13,11 +13,11 @@ import { Button } from "react-daisyui";
 //Components
 import SocialChoice from "../../components/Template/SocialChoice";
 
-//PDF
-import ReactToPdf from "react-to-pdf";
-
 //Styles
 import styles from "../../styles/template.module.css";
+
+//PDF
+import { DownloadPDF } from "../../components/Template/Download";
 
 //Assets
 import envelope from "../../assets/envelope-fill.svg";
@@ -248,17 +248,11 @@ const Template = () => {
       </div>
 
       <div className="flex flex-row py-6">
-        <ReactToPdf
-          targetRef={TemplateRef}
-          filename={`${firstName} ${lastName}'s CV`}
-          scale={0.9}
-        >
-          {({ toPdf }) => (
-            <Button onClick={toPdf} className="mx-auto" color="primary">
-              Download
-            </Button>
-          )}
-        </ReactToPdf>
+        <DownloadPDF
+          template={TemplateRef}
+          firstName={firstName}
+          lastName={lastName}
+        />
 
         <Button
           onClick={() => navigate("/build")}

@@ -5,18 +5,19 @@ import { Modal, Button } from "react-daisyui";
 //Template API
 import { templatesApi } from "../../api/templatesApi";
 
-const TemplateSelection = ({
-  isOpen,
-  handleTemplate,
-  handleButtonClick,
-  onClickBackdrop,
-  closeModal,
-  error,
-  ...props
-}) => {
+const TemplateSelection = (props) => {
+  const {
+    isOpen,
+    handleTemplate,
+    handleButtonClick,
+    onClickBackdrop,
+    closeModal,
+    error,
+    ...other
+  } = props;
   return (
     <div data-theme="fantasy" className="select-none">
-      <Modal open={isOpen} onClickBackdrop={onClickBackdrop} {...props}>
+      <Modal open={isOpen} onClickBackdrop={onClickBackdrop} {...other}>
         <Button
           size="sm"
           shape="circle"

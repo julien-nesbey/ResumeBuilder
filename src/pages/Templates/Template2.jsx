@@ -9,12 +9,10 @@ import { useValuesContext } from "../../context/ValuesContext";
 
 //Components
 import SocialChoice from "../../components/Template/SocialChoice";
+import { DownloadPDF } from "../../components/Template/Download";
 
 //DaisyUI
 import { Button } from "react-daisyui";
-
-//PDF
-import ReactToPdf from "react-to-pdf";
 
 //Styles
 import styles from "../../styles/template2.module.css";
@@ -215,22 +213,11 @@ const Template2 = () => {
       </div>
 
       <div className="flex flex-row py-6">
-        <ReactToPdf
-          targetRef={TemplateRef}
-          filename={`${firstName} ${lastName}'s CV`}
-          scale={0.8}
-          options={{
-            orientation: "portrait",
-            unit: "in",
-            format: [8.5, 11.9],
-          }}
-        >
-          {({ toPdf }) => (
-            <Button onClick={toPdf} className="mx-auto" color="primary">
-              Download
-            </Button>
-          )}
-        </ReactToPdf>
+        <DownloadPDF
+          template={TemplateRef}
+          firstName={firstName}
+          lastName={lastName}
+        />
 
         <Button
           onClick={() => navigate("/build")}
